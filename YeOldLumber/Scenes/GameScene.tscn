@@ -1,0 +1,493 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://1.jpg" type="Texture" id=1]
+[ext_resource path="res://oie_transparent.png" type="Texture" id=2]
+[ext_resource path="res://arbol.png" type="Texture" id=3]
+[ext_resource path="res://hit-effect-png-9.png" type="Texture" id=4]
+[ext_resource path="res://player.png" type="Texture" id=5]
+[ext_resource path="res://image_processing20191120-11867-14udb4r.png" type="Texture" id=6]
+[ext_resource path="res://oie_transparent-2.png" type="Texture" id=7]
+[ext_resource path="res://button.png" type="Texture" id=8]
+[ext_resource path="res://oie_JD1gX6gxenC4.png" type="Texture" id=9]
+[ext_resource path="res://oie_G7EKeFFRW5Uo.png" type="Texture" id=10]
+[ext_resource path="res://wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg" type="Texture" id=11]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var wood_count : int = 0
+var gold_count : int = 0
+var trees_chopped : int = 0
+
+signal tree_chopped(val)
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+func _on_Chop_button_down():
+	wood_count += 1
+	$GUI.chop(wood_count)
+	if $Tree/Anim.is_playing():
+		$Tree/Anim.stop()
+	$Tree/Anim.play('Chop')
+	pass # Replace with function body.
+
+
+func _on_GUI_tree_chopped():
+	trees_chopped += 1
+	emit_signal('tree_chopped', trees_chopped)
+	pass # Replace with function body.
+
+
+func _on_ExitButton_button_down():
+	get_tree().quit()
+	pass # Replace with function body.
+"
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.67451, 0.886275, 0.921569, 1 )
+
+[sub_resource type="Animation" id=2]
+resource_name = "Chop"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 4.02979, 0.0, -9.24979, 0.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Hit:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1, 0.4 ),
+"transitions": PoolRealArray( 0.5, 0.5, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends CanvasLayer
+
+export (NodePath) var wood_count
+export (NodePath) var gold_count
+signal tree_chopped
+
+func chop(wood):
+	if $MiddlePanel/WoodLog/Anim.is_playing():
+		$MiddlePanel/WoodLog/Anim.stop()
+	$MiddlePanel/WoodLog/Anim.play('Chop')
+	get_node(wood_count).text = str(wood)
+	$UpperPanel/TreeHealth/Bar.value -= 1
+	if $UpperPanel/TreeHealth/Bar.value <= 0:
+		emit_signal('tree_chopped')
+		$UpperPanel/TreeHealth/Bar.max_value += 1
+		$UpperPanel/TreeHealth/Bar.value = $UpperPanel/TreeHealth/Bar.max_value
+	pass
+
+func _on_GameScene_tree_chopped(val):
+	$UpperPanel/Trees/Count.text = str(val)
+	pass # Replace with function body.
+"
+
+[sub_resource type="Animation" id=4]
+length = 0.9
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.9 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:rect_position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.4 ),
+"transitions": PoolRealArray( 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 270, 508 ), Vector2( 270, 365 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.5, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Texture:rect_scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.2, 0.5 ),
+"transitions": PoolRealArray( 0.5, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1.2, 1.2 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="StyleBoxTexture" id=5]
+texture = ExtResource( 11 )
+region_rect = Rect2( 0, 0, 300, 250 )
+margin_bottom = 19.6576
+
+[node name="GameScene" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Background" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -43.0
+margin_top = -50.0
+margin_right = 778.0
+margin_bottom = 1317.0
+custom_styles/panel = SubResource( 6 )
+
+[node name="Sky" type="Sprite" parent="."]
+position = Vector2( 350.294, 285.403 )
+scale = Vector2( 0.969095, 1.23579 )
+texture = ExtResource( 1 )
+
+[node name="Grass" type="Sprite" parent="."]
+position = Vector2( 356.21, 1019.95 )
+scale = Vector2( 2.10724, 1.48238 )
+texture = ExtResource( 2 )
+
+[node name="Tree" type="Sprite" parent="."]
+editor/display_folded = true
+position = Vector2( 159.559, 1022.69 )
+scale = Vector2( 2.54521, 2.54521 )
+texture = ExtResource( 3 )
+offset = Vector2( -4.60874, -157.84 )
+
+[node name="Hit" type="Sprite" parent="Tree"]
+self_modulate = Color( 1, 1, 1, 0 )
+position = Vector2( 19.4164, -62.7065 )
+scale = Vector2( 0.331046, 0.331046 )
+texture = ExtResource( 4 )
+
+[node name="Anim" type="AnimationPlayer" parent="Tree"]
+anims/Chop = SubResource( 2 )
+
+[node name="Player" type="Sprite" parent="."]
+position = Vector2( 392.014, 1070.48 )
+scale = Vector2( 0.641456, 0.641456 )
+texture = ExtResource( 5 )
+offset = Vector2( -43.0723, -208.098 )
+
+[node name="GUI" type="CanvasLayer" parent="."]
+script = SubResource( 3 )
+wood_count = NodePath("UpperPanel/Wood/Count")
+gold_count = NodePath("UpperPanel/Coin/Count")
+
+[node name="UpperPanel" type="Control" parent="GUI"]
+editor/display_folded = true
+anchor_right = 1.0
+margin_bottom = 126.0
+
+[node name="Wood" type="Control" parent="GUI/UpperPanel"]
+editor/display_folded = true
+margin_right = 248.0
+margin_bottom = 126.0
+
+[node name="Texture" type="TextureRect" parent="GUI/UpperPanel/Wood"]
+margin_left = 18.4628
+margin_top = 8.53801
+margin_right = 84.4628
+margin_bottom = 82.538
+rect_rotation = 41.4395
+rect_pivot_offset = Vector2( 31.7105, 37.8098 )
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+
+[node name="Count" type="Label" parent="GUI/UpperPanel/Wood"]
+margin_left = 94.664
+margin_top = 22.656
+margin_right = 155.664
+margin_bottom = 38.656
+rect_scale = Vector2( 3, 3 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="Coin" type="Control" parent="GUI/UpperPanel"]
+editor/display_folded = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -124.0
+margin_top = -63.0
+margin_right = 124.0
+margin_bottom = 63.0
+
+[node name="Texture" type="TextureRect" parent="GUI/UpperPanel/Coin"]
+margin_left = 19.2128
+margin_top = 5.53789
+margin_right = 85.2128
+margin_bottom = 79.5379
+rect_rotation = -2.1646
+rect_pivot_offset = Vector2( 31.7105, 37.8098 )
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 6
+
+[node name="Count" type="Label" parent="GUI/UpperPanel/Coin"]
+margin_left = 94.664
+margin_top = 22.656
+margin_right = 155.664
+margin_bottom = 38.656
+rect_scale = Vector2( 3, 3 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="Trees" type="Control" parent="GUI/UpperPanel"]
+editor/display_folded = true
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -258.0
+margin_top = 1.23488
+margin_bottom = 85.2349
+
+[node name="Textures" type="Control" parent="GUI/UpperPanel/Trees"]
+editor/display_folded = true
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 0.830139
+margin_top = -33.5192
+margin_right = 97.8301
+margin_bottom = 43.4808
+
+[node name="Tree1" type="TextureRect" parent="GUI/UpperPanel/Trees/Textures"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -56.3488
+margin_top = -36.8221
+margin_right = 31.6512
+margin_bottom = 28.1779
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="Tree2" type="TextureRect" parent="GUI/UpperPanel/Trees/Textures"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -28.564
+margin_top = -38.057
+margin_right = 59.436
+margin_bottom = 26.943
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="Tree3" type="TextureRect" parent="GUI/UpperPanel/Trees/Textures"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -44.0
+margin_top = -32.5
+margin_right = 44.0
+margin_bottom = 32.5
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="Count" type="Label" parent="GUI/UpperPanel/Trees"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -24.5988
+margin_top = -22.572
+margin_right = -1.59882
+margin_bottom = -8.57196
+rect_scale = Vector2( 3, 3 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="TreeHealth" type="Control" parent="GUI/UpperPanel"]
+editor/display_folded = true
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -43.0
+
+[node name="Bar" type="TextureProgress" parent="GUI/UpperPanel/TreeHealth"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -340.0
+margin_top = -20.0
+margin_right = 340.0
+margin_bottom = 20.0
+max_value = 5.0
+value = 5.0
+texture_under = ExtResource( 8 )
+texture_progress = ExtResource( 8 )
+tint_progress = Color( 0.337255, 1, 0, 1 )
+nine_patch_stretch = true
+
+[node name="Tree" type="TextureRect" parent="GUI/UpperPanel/TreeHealth"]
+margin_left = 8.01628
+margin_top = -11.9837
+margin_right = 97.0163
+margin_bottom = 53.0163
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="MiddlePanel" type="Control" parent="GUI"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -362.0
+margin_top = -483.5
+margin_right = 362.0
+margin_bottom = 483.5
+
+[node name="Chop" type="TextureButton" parent="GUI/MiddlePanel"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -185.0
+margin_top = -187.0
+margin_right = -7.0
+margin_bottom = -8.0
+texture_normal = ExtResource( 9 )
+expand = true
+stretch_mode = 5
+
+[node name="Axe" type="TextureRect" parent="GUI/MiddlePanel/Chop"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -59.5
+margin_top = -59.5
+margin_right = 59.5
+margin_bottom = 59.5
+rect_pivot_offset = Vector2( 50.4536, 52.0652 )
+mouse_filter = 2
+texture = ExtResource( 10 )
+expand = true
+stretch_mode = 6
+
+[node name="WoodLog" type="Control" parent="GUI/MiddlePanel"]
+editor/display_folded = true
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_left = 270.0
+margin_top = 365.0
+margin_right = 516.0
+margin_bottom = 511.0
+
+[node name="Texture" type="TextureRect" parent="GUI/MiddlePanel/WoodLog"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -105.796
+margin_top = -81.0
+margin_right = 56.2045
+margin_bottom = 81.0
+rect_rotation = 47.0359
+rect_pivot_offset = Vector2( 83.3134, 85.448 )
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="GUI/MiddlePanel/WoodLog"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -47.0
+margin_top = -37.0
+margin_right = -15.0
+margin_bottom = -18.0
+rect_scale = Vector2( 3, 3 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "+1"
+
+[node name="Anim" type="AnimationPlayer" parent="GUI/MiddlePanel/WoodLog"]
+anims/Chop = SubResource( 4 )
+
+[node name="LowerPanel" type="Control" parent="GUI"]
+editor/display_folded = true
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -160.0
+
+[node name="BackroundPanel" type="Panel" parent="GUI/LowerPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_styles/panel = SubResource( 5 )
+
+[node name="ExitButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
+editor/display_folded = true
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -60.5
+margin_right = 146.0
+margin_bottom = 60.5
+texture_normal = ExtResource( 8 )
+expand = true
+
+[node name="Label" type="Label" parent="GUI/LowerPanel/BackroundPanel/ExitButton"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -13.5
+margin_top = -7.0
+margin_right = 13.5
+margin_bottom = 7.0
+rect_scale = Vector2( 3, 3 )
+rect_pivot_offset = Vector2( 12.802, 6.80798 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "EXIT"
+[connection signal="tree_chopped" from="." to="GUI" method="_on_GameScene_tree_chopped"]
+[connection signal="tree_chopped" from="GUI" to="." method="_on_GUI_tree_chopped"]
+[connection signal="button_down" from="GUI/MiddlePanel/Chop" to="." method="_on_Chop_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ExitButton" to="." method="_on_ExitButton_button_down"]
