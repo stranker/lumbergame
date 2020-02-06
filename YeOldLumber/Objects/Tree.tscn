@@ -1,0 +1,170 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://arbol.png" type="Texture" id=1]
+[ext_resource path="res://hit-effect-png-9.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+export var health : int = 0
+signal tree_down
+signal delete_tree
+
+var can_be_chopped : bool = false
+
+
+func take_chop(axe_damage : int):
+	if can_chop():
+		health -= axe_damage
+		if $Anim.is_playing():
+			$Anim.stop()
+		$Anim.play('Chop')
+		if health <= 0:
+			emit_signal('tree_down')
+
+func _on_Tree_tree_down():
+	$Anim.play('TreeDown')
+	pass # Replace with function body.
+
+
+func _on_Anim_animation_finished(anim_name):
+	if anim_name == 'TreeDown':
+		emit_signal('delete_tree')
+		call_deferred('queue_free')
+	if anim_name == 'Enter':
+		can_be_chopped = true
+	pass # Replace with function body.
+
+func can_chop():
+	return health > 0 and can_be_chopped"
+
+[sub_resource type="Animation" id=2]
+length = 0.4
+tracks/0/type = "value"
+tracks/0/path = NodePath("Hit:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.4 ),
+"transitions": PoolRealArray( 0.5, 0.5, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Texture:rotation_degrees")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, -8.94396, 0.0 ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "Enter"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Texture:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( -242.393, -3.75561 ), Vector2( -1.84193, -0.286125 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Hit:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "TreeDown"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Texture:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 6.8131, -67.2081 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Texture:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1.6276, -6.0686 ), Vector2( 294.838, -4.04354 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Hit:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
+}
+
+[node name="Tree" type="Node2D"]
+position = Vector2( 1.07227, 1.22394 )
+scale = Vector2( 2.54521, 2.54521 )
+script = SubResource( 1 )
+health = 5
+
+[node name="Texture" type="Sprite" parent="."]
+position = Vector2( 1.6276, -6.0686 )
+texture = ExtResource( 1 )
+offset = Vector2( 1.44362, -161.825 )
+
+[node name="Hit" type="Sprite" parent="."]
+self_modulate = Color( 1, 1, 1, 0 )
+position = Vector2( 19.4164, -62.7065 )
+scale = Vector2( 0.331046, 0.331046 )
+texture = ExtResource( 2 )
+
+[node name="Anim" type="AnimationPlayer" parent="."]
+autoplay = "Enter"
+anims/Chop = SubResource( 2 )
+anims/Enter = SubResource( 4 )
+anims/TreeDown = SubResource( 3 )
+[connection signal="tree_down" from="." to="." method="_on_Tree_tree_down"]
+[connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]
