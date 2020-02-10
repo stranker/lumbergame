@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Coin.vox-1138e47a70a0df3b5a3bc2e63e708f6d.mesh"
+
+[deps]
+
+source_file="res://Assets/Coin.vox"
+dest_files=[ "res://.import/Coin.vox-1138e47a70a0df3b5a3bc2e63e708f6d.mesh" ]
+
+[params]
+

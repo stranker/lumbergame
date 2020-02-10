@@ -1,170 +1,102 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://arbol.png" type="Texture" id=1]
-[ext_resource path="res://hit-effect-png-9.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Trees/TreeTrunk.vox" type="ArrayMesh" id=1]
+[ext_resource path="res://Assets/Trees/TreeTrunk2.vox" type="ArrayMesh" id=2]
+[ext_resource path="res://Assets/Trees/TreeTrunk3.vox" type="ArrayMesh" id=3]
+[ext_resource path="res://Assets/Trees/TreeLeaves1.vox" type="ArrayMesh" id=4]
+[ext_resource path="res://Assets/Trees/TreeLeaves2.vox" type="ArrayMesh" id=5]
+[ext_resource path="res://Assets/Trees/TreeLeaves3.vox" type="ArrayMesh" id=6]
+[ext_resource path="res://Assets/Trees/TreeLeaves4.vox" type="ArrayMesh" id=7]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends Node2D
+script/source = "extends Spatial
 
-export var health : int = 0
+export var health : int = 5
+export (Array, Mesh) var trunk_array
+export (Array, Mesh) var leaves_array
+
 signal tree_down
-signal delete_tree
-
-var can_be_chopped : bool = false
+signal on_chopped(health)
 
 
-func take_chop(axe_damage : int):
-	if can_chop():
-		health -= axe_damage
-		if $Anim.is_playing():
-			$Anim.stop()
+func _ready():
+	randomize_tree()
+	pass
+
+func randomize_tree():
+	$TreeTrunk.mesh = trunk_array[randi() % trunk_array.size()]
+	$TreeTrunk/TreeLeaves.mesh = leaves_array[randi() % leaves_array.size()]
+	pass
+
+func interpolate_fall():
+	var new_y_rotation = rand_range(100,200)
+	rotation_degrees.y = new_y_rotation
+	var new_rotation = Vector3(0,new_y_rotation,85)
+	$Tween.interpolate_property(self,'rotation_degrees', rotation_degrees, new_rotation,
+	0.5,Tween.TRANS_LINEAR,Tween.EASE_OUT, 0.1)
+	$Tween.start()
+	pass
+
+func take_chop(damage):
+	if is_alive():
+		health -= damage
 		$Anim.play('Chop')
+		emit_signal('on_chopped', health)
 		if health <= 0:
 			emit_signal('tree_down')
+			transparency()
+			interpolate_fall()
+	pass
 
-func _on_Tree_tree_down():
-	$Anim.play('TreeDown')
+func transparency():
+	var new_mat = $TreeTrunk/TreeLeaves.mesh.surface_get_material(0).duplicate()
+	new_mat.flags_transparent = true
+	$TreeTrunk/TreeLeaves.material_override = new_mat
+	$Tween.interpolate_property(new_mat,'albedo_color', Color.white,
+	Color(1,1,1,0), 0.5, Tween.TRANS_LINEAR, Tween.EASE_OUT, 0.2)
+	pass
+
+func is_alive():
+	return health > 0
+
+func _on_Tween_tween_all_completed():
+	call_deferred('queue_free')
 	pass # Replace with function body.
-
-
-func _on_Anim_animation_finished(anim_name):
-	if anim_name == 'TreeDown':
-		emit_signal('delete_tree')
-		call_deferred('queue_free')
-	if anim_name == 'Enter':
-		can_be_chopped = true
-	pass # Replace with function body.
-
-func can_chop():
-	return health > 0 and can_be_chopped"
+"
 
 [sub_resource type="Animation" id=2]
-length = 0.4
+length = 0.5
 tracks/0/type = "value"
-tracks/0/path = NodePath("Hit:self_modulate")
+tracks/0/path = NodePath("TreeTrunk:rotation_degrees")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.1, 0.4 ),
-"transitions": PoolRealArray( 0.5, 0.5, 1 ),
+"times": PoolRealArray( 0, 0.1, 0.5 ),
+"transitions": PoolRealArray( 1, 0.5, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Texture:rotation_degrees")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.1, 0.4 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ 0.0, -8.94396, 0.0 ]
+"values": [ Vector3( 0, 0, 0 ), Vector3( -5.31028, 0.626021, -13.4376 ), Vector3( 0, 0, 0 ) ]
 }
 
-[sub_resource type="Animation" id=4]
-resource_name = "Enter"
-length = 0.3
-tracks/0/type = "value"
-tracks/0/path = NodePath("Texture:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.3 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector2( -242.393, -3.75561 ), Vector2( -1.84193, -0.286125 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Hit:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-
-[sub_resource type="Animation" id=3]
-resource_name = "TreeDown"
-tracks/0/type = "value"
-tracks/0/path = NodePath("Texture:rotation_degrees")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.1, 0.8 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ 0.0, 6.8131, -67.2081 ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath(".:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.6, 1 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath("Texture:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0, 0.3 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector2( 1.6276, -6.0686 ), Vector2( 294.838, -4.04354 ) ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("Hit:visible")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ false ]
-}
-
-[node name="Tree" type="Node2D"]
-position = Vector2( 1.07227, 1.22394 )
-scale = Vector2( 2.54521, 2.54521 )
+[node name="Tree" type="Spatial"]
+transform = Transform( 0.583964, 0, -0.811779, 0, 1, 0, 0.811779, 0, 0.583964, 0, 0, 0 )
 script = SubResource( 1 )
-health = 5
-
-[node name="Texture" type="Sprite" parent="."]
-position = Vector2( 1.6276, -6.0686 )
-texture = ExtResource( 1 )
-offset = Vector2( 1.44362, -161.825 )
-
-[node name="Hit" type="Sprite" parent="."]
-self_modulate = Color( 1, 1, 1, 0 )
-position = Vector2( 19.4164, -62.7065 )
-scale = Vector2( 0.331046, 0.331046 )
-texture = ExtResource( 2 )
+trunk_array = [ ExtResource( 1 ), ExtResource( 2 ), ExtResource( 3 ) ]
+leaves_array = [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ]
 
 [node name="Anim" type="AnimationPlayer" parent="."]
-autoplay = "Enter"
 anims/Chop = SubResource( 2 )
-anims/Enter = SubResource( 4 )
-anims/TreeDown = SubResource( 3 )
-[connection signal="tree_down" from="." to="." method="_on_Tree_tree_down"]
-[connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="TreeTrunk" type="MeshInstance" parent="."]
+transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0 )
+mesh = ExtResource( 1 )
+material/0 = null
+
+[node name="TreeLeaves" type="MeshInstance" parent="TreeTrunk"]
+transform = Transform( 1, 0, 2.08616e-007, 0, 1, 0, -2.08616e-007, 0, 1, 0, 18.7543, 0 )
+mesh = ExtResource( 6 )
+material/0 = null
+[connection signal="tween_all_completed" from="Tween" to="." method="_on_Tween_tween_all_completed"]

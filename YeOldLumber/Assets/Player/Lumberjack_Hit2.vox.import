@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Lumberjack_Hit2.vox-06bcbdf9d5ff89c3d60818fd037dfe2a.mesh"
+
+[deps]
+
+source_file="res://Assets/Player/Lumberjack_Hit2.vox"
+dest_files=[ "res://.import/Lumberjack_Hit2.vox-06bcbdf9d5ff89c3d60818fd037dfe2a.mesh" ]
+
+[params]
+

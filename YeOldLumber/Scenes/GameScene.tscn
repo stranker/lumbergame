@@ -1,234 +1,261 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Objects/Tree.tscn" type="PackedScene" id=1]
-[ext_resource path="res://1.jpg" type="Texture" id=2]
-[ext_resource path="res://oie_transparent.png" type="Texture" id=3]
+[ext_resource path="res://Objects/WoodenLog.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/ChopParticles.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=4]
-[ext_resource path="res://image_processing20191120-11867-14udb4r.png" type="Texture" id=5]
-[ext_resource path="res://oie_transparent-2.png" type="Texture" id=6]
-[ext_resource path="res://arbol.png" type="Texture" id=7]
-[ext_resource path="res://button.png" type="Texture" id=8]
-[ext_resource path="res://wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg" type="Texture" id=9]
+[ext_resource path="res://default_env.tres" type="Environment" id=5]
+[ext_resource path="res://Assets/Rock2.vox" type="ArrayMesh" id=6]
+[ext_resource path="res://Assets/Rock.vox" type="ArrayMesh" id=7]
+[ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=8]
+[ext_resource path="res://UI/CoinUI.png" type="Texture" id=9]
+[ext_resource path="res://arbol.png" type="Texture" id=10]
+[ext_resource path="res://button.png" type="Texture" id=11]
+[ext_resource path="res://wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg" type="Texture" id=12]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends Node2D
+script/source = "extends Node
 
 var wood_count : int = 0
 var gold_count : int = 0
 var trees_chopped : int = 0
 
-export (PackedScene) var tree_scene = null
+export (PackedScene) var tree_scene
+export (PackedScene) var wooden_log_scene
+export (PackedScene) var particles_scene
 
-var current_tree = null
-onready var initial_grass_pos : Vector2 = $Grass.position
+var current_tree
 
-signal on_tree_down(trees_chopped)
-signal on_tree_chopped(axe_damage)
-signal on_new_tree(tree)
-signal update_wood_count(wood_count)
+signal chop_tree(wood_count)
+signal tree_down(trees_chopped)
+signal new_tree(tree)
+signal on_gold_changed(gold_count)
+signal on_wood_changed(wood_count)
 
 func _ready():
 	spawn_new_tree()
-	pass # Replace with function body.
+	pass
 
 func spawn_new_tree():
 	var new_tree = tree_scene.instance()
-	new_tree.position = $TreePosition.position
-	$TreeNode.call_deferred('add_child', new_tree)
-	new_tree.connect('tree_down',self,'on_tree_down')
+	$World.call_deferred('add_child',new_tree)
+	new_tree.translation = $World/TreePos.translation
 	current_tree = new_tree
-	emit_signal('on_new_tree',new_tree)
-	pass
-
-func _on_ExitButton_button_down():
-	get_tree().quit()
-	print(1)
-	pass # Replace with function body.
-
-func on_tree_down():
-	trees_chopped += 1
-	emit_signal('on_tree_down', trees_chopped)
-	$Grass/Anim.play('Run')
-	spawn_new_tree()
+	new_tree.connect('tree_down', self, 'on_tree_down')
+	new_tree.connect('on_chopped', self, 'on_tree_chopped')
+	emit_signal('new_tree',new_tree)
 	pass
 
 func _on_ClickArea_gui_input(event):
 	if event is InputEventScreenTouch and !event.is_echo() and event.pressed:
-		if current_tree and current_tree.can_chop():
-			emit_signal('on_tree_chopped',1)
-			current_tree.take_chop(1)
+		if current_tree and current_tree.is_alive():
 			wood_count += 1
-			emit_signal('update_wood_count', wood_count)
+			emit_signal('chop_tree', wood_count)
+			current_tree.take_chop(1)
+			spawn_wooden_log()
+			spawn_particles()
+	pass # Replace with function body.
+
+func spawn_particles():
+	var part = particles_scene.instance()
+	part.translation = $World/TreePos/ChopParticles.translation
+	$World/TreePos/ChopParticles.call_deferred('add_child',part)
+	pass
+
+func spawn_wooden_log():
+	var new_wlog = wooden_log_scene.instance()
+	call_deferred('add_child',new_wlog)
+	new_wlog.translation = $World/WLPos.translation
+	pass
+
+func on_tree_chopped(health):
+	$GUI.on_tree_chopped(health)
+	pass
+
+func on_tree_down():
+	trees_chopped += 1
+	emit_signal('tree_down', trees_chopped)
+	spawn_new_tree()
 	pass # Replace with function body.
 
 
-func _on_Anim_animation_finished(anim_name):
-	if anim_name == 'Run':
-		$Grass.position = initial_grass_pos
+func _on_ExitButton_button_down():
+	get_tree().quit()
+	pass # Replace with function body.
+
+
+func _on_Shop_sell_wooden():
+	gold_count += wood_count
+	wood_count = 0
+	emit_signal('on_gold_changed', gold_count)
+	emit_signal('on_wood_changed', wood_count)
 	pass # Replace with function body.
 "
 
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.67451, 0.886275, 0.921569, 1 )
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 0.25098, 0.745098, 0.027451, 1 )
 
-[sub_resource type="StyleBoxFlat" id=6]
-bg_color = Color( 0.203922, 0.588235, 0.772549, 1 )
+[sub_resource type="CubeMesh" id=3]
+material = SubResource( 2 )
+size = Vector3( 50, 1, 50 )
 
-[sub_resource type="Animation" id=7]
-resource_name = "Run"
-length = 0.3
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.3 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector2( 388.029, 1006.57 ), Vector2( 1090, 1006.57 ) ]
-}
+[sub_resource type="SpatialMaterial" id=4]
+flags_transparent = true
+flags_unshaded = true
+flags_disable_ambient_light = true
+vertex_color_use_as_albedo = true
+albedo_color = Color( 1, 1, 1, 0.647059 )
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="CubeMesh" id=5]
+material = SubResource( 4 )
+size = Vector3( 10, 2, 10 )
+
+[sub_resource type="GDScript" id=6]
 script/source = "extends CanvasLayer
 
 export (NodePath) var wood_count
 export (NodePath) var gold_count
 
-func _on_GameScene_on_tree_down(trees_chopped):
+func _on_GameScene_tree_down(trees_chopped):
 	$UpperPanel/Trees/Count.text = str(trees_chopped)
 	pass # Replace with function body.
 
-func _on_GameScene_on_tree_chopped(axe_damage):
-	if $MiddlePanel/WoodLog/Anim.is_playing():
-		$MiddlePanel/WoodLog/Anim.stop()
-	$MiddlePanel/WoodLog/Label.text = '+ ' + str(axe_damage)
-	$MiddlePanel/WoodLog/Anim.play('Chop')
-	$UpperPanel/TreeHealth/Bar.value -= axe_damage
-	pass # Replace with function body.
+func on_tree_chopped(health):
+	$UpperPanel/TreeHealth/Bar.value = health
 
-func _on_GameScene_on_new_tree(tree):
+func _on_GameScene_new_tree(tree):
 	$UpperPanel/TreeHealth/Bar.max_value = tree.health
 	$UpperPanel/TreeHealth/Bar.value = tree.health
 	pass # Replace with function body.
 
+func _on_GameScene_chop_tree(wood):
+	get_node(wood_count).text = str(wood)
+	pass # Replace with function body.
 
-func _on_GameScene_update_wood_count(wood):
-	$UpperPanel/Wood/Count.text = str(wood)
+
+func _on_GameScene_on_gold_changed(gold):
+	get_node(gold_count).text = str(gold)
+	pass # Replace with function body.
+
+
+func _on_GameScene_on_wood_changed(wood):
+	get_node(wood_count).text = str(wood)
 	pass # Replace with function body.
 "
 
-[sub_resource type="Animation" id=4]
-length = 0.9
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:visible")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.9 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ true, false ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath(".:rect_position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.4 ),
-"transitions": PoolRealArray( 0.5, 1 ),
-"update": 0,
-"values": [ Vector2( 270, 508 ), Vector2( 270, 365 ) ]
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath(".:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0, 0.5, 0.8 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("Texture:rect_scale")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0, 0.2, 0.5 ),
-"transitions": PoolRealArray( 0.5, 1, 1 ),
-"update": 0,
-"values": [ Vector2( 1, 1 ), Vector2( 1.2, 1.2 ), Vector2( 1, 1 ) ]
-}
+[sub_resource type="GDScript" id=8]
+script/source = "extends Control
 
-[sub_resource type="StyleBoxTexture" id=5]
-texture = ExtResource( 9 )
+signal sell_wooden
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+func _on_SellWL_button_down():
+	emit_signal('sell_wooden')
+	pass # Replace with function body.
+
+
+func _on_Close_button_down():
+	$Backpanel.hide()
+	pass # Replace with function body.
+
+
+func _on_ShopButton_button_down():
+	$Backpanel.show()
+	pass # Replace with function body.
+"
+
+[sub_resource type="StyleBoxTexture" id=7]
+texture = ExtResource( 12 )
 region_rect = Rect2( 0, 0, 300, 250 )
 margin_bottom = 19.6576
 
-[node name="GameScene" type="Node2D"]
+[node name="GameScene" type="Node"]
 script = SubResource( 1 )
 tree_scene = ExtResource( 1 )
+wooden_log_scene = ExtResource( 2 )
+particles_scene = ExtResource( 3 )
 
-[node name="Background" type="Panel" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -43.0
-margin_top = -50.0
-margin_right = 778.0
-margin_bottom = 1317.0
-mouse_filter = 2
-custom_styles/panel = SubResource( 2 )
-
-[node name="Background2" type="Panel" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -43.0
-margin_top = -50.0
-margin_right = 778.0
-margin_bottom = 129.0
-mouse_filter = 2
-custom_styles/panel = SubResource( 6 )
-
-[node name="Sky" type="Sprite" parent="."]
-position = Vector2( 368.134, 363.8 )
-texture = ExtResource( 2 )
-
-[node name="Grass" type="Node2D" parent="."]
+[node name="World" type="Spatial" parent="."]
 editor/display_folded = true
-position = Vector2( 388.029, 1006.57 )
 
-[node name="Grass" type="Sprite" parent="Grass"]
-scale = Vector2( 2.10724, 1.48238 )
-texture = ExtResource( 3 )
+[node name="Player" parent="World" instance=ExtResource( 4 )]
+transform = Transform( 0.924308, 0, 0.381649, 0, 1, 0, -0.381649, 0, 0.924308, -0.903036, 1.00931, -5.73368 )
 
-[node name="Grass2" type="Sprite" parent="Grass"]
-position = Vector2( -730, 0 )
-scale = Vector2( 2.10724, 1.48238 )
-texture = ExtResource( 3 )
+[node name="TreePos" type="Position3D" parent="World"]
+editor/display_folded = true
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0601234, 0, 1.94504 )
 
-[node name="Anim" type="AnimationPlayer" parent="Grass"]
-anims/Run = SubResource( 7 )
+[node name="ChopParticles" type="Position3D" parent="World/TreePos"]
+transform = Transform( -1, 0, -8.74228e-008, 0, 1, 0, 8.74228e-008, 0, -1, -2.55483, 4.62651, -1.24022 )
 
-[node name="TreeNode" type="Node2D" parent="."]
+[node name="Floor" type="MeshInstance" parent="World"]
+transform = Transform( 0.636778, 0, 0.771047, 0, 1, 0, -0.771047, 0, 0.636778, 0, 0, 0 )
+mesh = SubResource( 3 )
+material/0 = null
 
-[node name="TreePosition" type="Position2D" parent="."]
-position = Vector2( 168.846, 1040.31 )
+[node name="Camera" type="Camera" parent="World"]
+transform = Transform( -0.0580869, -0.102446, 0.993041, 0, 0.994721, 0.102619, -0.998312, 0.00596081, -0.0577802, 40.126, 23.247, -0.088 )
+environment = ExtResource( 5 )
+current = true
+fov = 80.8
+near = 6.45
+far = 167.2
 
-[node name="Player" parent="." instance=ExtResource( 4 )]
-position = Vector2( 388.046, 1022.84 )
+[node name="SpotLight" type="SpotLight" parent="World"]
+transform = Transform( 1, 0, 0, 0, -0.59085, 0.806781, 0, -0.806781, -0.59085, 0, 46.4474, -17.8958 )
+light_energy = 3.97
+light_bake_mode = 2
+shadow_enabled = true
+shadow_color = Color( 0.976471, 0.854902, 0.627451, 1 )
+shadow_reverse_cull_face = true
+spot_range = 74.6116
+spot_attenuation = 0.482968
+spot_angle = 52.7908
+spot_angle_attenuation = 0.554785
+
+[node name="Clouds" type="CPUParticles" parent="World"]
+transform = Transform( -0.673776, 0, 0.738935, 0, 1, 0, -0.738935, 0, -0.673776, -34.5861, 34.367, 31.0878 )
+lifetime = 40.0
+mesh = SubResource( 5 )
+emission_shape = 3
+emission_points = PoolVector3Array( 27.2362, 7.59302, -30.4186, -14.5512, 6.49074, -44.7041, 11.5653, 4.93025, -5.36783, 4.56644, 2.52489, -53.4172, -3.41951, 1.13902, -41.1124, -8.71293, 8.21122, -21.6993, -19.1991, 5.44327, -24.4244, 3.49033, 7.63535, -10.5319, -9.91798, 1.45052, -34.7158, -17.9527, 5.15454, -42.0366, -16.7855, 5.42889, -44.0003, -2.9733, 0.785571, -28.6828, 26.6526, 2.21768, -35.5579, 31.9874, 5.69318, -27.8588, 1.58553, 8.37086, -47.1655, 13.1629, 7.20187, -52.7925, -19.5458, 4.27636, -36.1262, 14.8888, 3.95754, -6.92135, -7.04793, 1.08893, -30.2999, 15.4208, 1.25714, -42.8585, 21.7856, 1.56845, -38.6426, 28.8773, 3.18858, -22.4946, -0.44897, 0.658799, -34.1739, 31.1746, 3.79403, -36.5809, 18.7437, 6.59327, -10.2259, 25.9308, 5.47062, -48.5027, 25.5827, 2.25093, -39.4782, -6.73246, 2.59298, -12.8091, 12.0936, 4.13387, -5.90129, 22.3237, 3.58567, -11.892, 21.5629, 2.03565, -18.3429, -1.47623, 9.0392, -25.2257, 18.316, 1.15166, -24.4959, 5.73255, 1.53756, -14.1826, -1.70444, 8.7908, -21.1237, 7.87834, 8.45055, -47.0967, 23.0881, 2.45125, -45.2108, 29.5696, 6.91851, -34.158, -13.7928, 7.82397, -30.0495, -14.891, 3.15305, -19.2107, 10.9467, 6.01728, -6.06813, 17.2328, 1.66509, -17.1184, 15.4637, 0.861827, -36.2659, 14.7834, 1.23985, -43.1742, 11.3957, 8.90878, -21.0441, 10.673, 7.43475, -52.5306, -7.32058, 1.24128, -25.3379, -3.88696, 6.6758, -53.3363, -2.64667, 0.927858, -38.5182, 17.1709, 7.47388, -12.6197, -9.20983, 1.90744, -19.4401, 4.73319, 0.643986, -37.958, 6.02644, 7.81468, -51.2617, -2.74232, 8.17842, -46.766, 11.1426, 0.986286, -42.3632, 27.2226, 5.98473, -45.9366, 23.9997, 6.9358, -15.8801, 0.708528, 9.24359, -32.7331, -7.34895, 8.6728, -27.4444, 8.01968, 1.55149, -48.2891, 24.1316, 1.66982, -31.5295, -11.213, 1.58513, -31.0524, 0.0709978, 9.07137, -38.0917, 13.1498, 1.82709, -13.6595, -4.9811, 1.87498, -46.8581, 15.8702, 1.1117, -40.5976, 8.49998, 8.29737, -48.1711, -11.6292, 5.71203, -12.2688, 13.0943, 2.61841, -52.7406, 3.38828, 1.49759, -47.7944, 15.0522, 3.67905, -7.45499, 11.9327, 4.11292, -56.5896, 8.66489, 8.7331, -44.4145, 28.6909, 6.93303, -24.4175, 31.9642, 5.52286, -35.8754, 4.66561, 9.13907, -23.3815, -1.59092, 0.730187, -27.6759, -2.53017, 7.59592, -12.0519, 26.0553, 4.02107, -47.799, 10.6801, 5.14458, -57.2743, 27.3138, 2.54949, -24.0425, 17.1763, 7.82759, -47.8839, -3.20724, 1.01148, -39.4286, 19.9125, 4.63386, -53.7812, -5.78323, 2.42098, -49.5062, 22.9639, 1.70437, -38.2551, 4.73908, 8.57405, -16.3932, 9.23741, 0.846575, -41.1431, 16.5749, 0.971563, -25.2422, 20.0902, 1.75261, -19.057, -11.3675, 2.56088, -17.3483, 22.7911, 2.24929, -18.2633, 4.00405, 9.28278, -35.1604, 22.7149, 8.29685, -35.5408, -0.815155, 1.33279, -17.4107, -4.07026, 0.875674, -34.5223, 8.38906, 0.530559, -28.6102, -8.4055, 2.41926, -14.9637, -7.7842, 8.66031, -28.7708, -10.8964, 7.57806, -18.7413, 28.4559, 6.18661, -19.221, -2.97908, 1.04762, -40.2138, 17.3913, 0.915636, -32.2855, 24.4139, 4.80726, -12.1066, 7.17612, 3.09302, -55.3438, 24.5488, 2.00681, -38.9524, 9.38746, 0.65099, -24.9722, -18.3106, 3.42315, -26.7073, 6.98402, 8.66643, -17.1473, 6.20933, 0.505151, -33.3634, -13.8275, 7.21879, -20.7238, 29.3799, 6.79879, -37.2268, 2.81123, 0.616176, -26.0411, 17.2201, 7.75778, -48.2559, -2.96025, 3.61816, -54.8035, 7.03467, 1.87882, -12.0361, 29.3436, 3.09047, -37.8486, 19.3353, 2.32333, -14.3171, 7.82221, 7.61146, -10.3196, -15.1309, 7.34871, -37.1201, 2.0244, 1.85514, -12.6157, 4.68396, 2.81608, -54.4669, 5.82952, 6.59116, -55.7064, 25.7758, 7.8629, -28.7429, -8.24417, 1.29711, -26.4299, -8.01476, 6.71257, -50.8374, -6.43404, 2.03148, -46.8489, -6.75315, 1.65401, -43.5672, -8.49149, 7.73279, -17.0331, 25.0894, 7.99237, -29.3152, 21.9616, 7.76896, -18.5821, 27.0536, 3.1535, -18.8691, 19.9247, 1.23304, -26.1706, 26.0727, 7.76914, -34.9114, -4.71457, 5.11723, -7.13697, -16.7848, 7.09609, -33.1564, 3.13416, 8.30552, -14.4885, 23.1015, 1.5918, -27.0394, -2.8655, 9.07373, -29.8649, 13.2849, 3.63778, -6.96135, -18.4505, 3.61618, -25.5482, 2.93788, 1.0163, -19.1668, -6.27075, 7.6787, -47.7653, 24.4133, 7.80158, -22.7913, -17.7753, 6.48591, -24.9906, 17.9278, 0.970295, -33.5575, 26.0821, 3.68009, -15.5154, 3.30583, 7.86624, -11.6884, -9.28483, 5.825, -52.0214, 12.7187, 1.48956, -15.8519, 23.1624, 2.33422, -18.0878, 2.32115, 7.87655, -11.9395, -6.41342, 1.02672, -30.4205, 16.3239, 9.0052, -32.1235, -7.48642, 8.68921, -28.8062, 3.22567, 1.31341, -46.279, 11.114, 9.0949, -24.0068, -20.0214, 4.28909, -31.411, 8.06535, 4.46197, -5.00795, 16.003, 8.99586, -28.1225, 6.78893, 9.14171, -39.1684, 21.1046, 2.25711, -46.1698, 10.4312, 1.37405, -46.4898, 30.9921, 6.0771, -37.1898, 27.8004, 2.42783, -27.9962, 24.2501, 6.37753, -48.4869, -2.12849, 1.9296, -48.8986, 23.5489, 7.9731, -23.2062, -16.1768, 2.55685, -30.1281, 9.29154, 0.538546, -29.1227, -4.1203, 8.91434, -26.3414, 15.503, 7.34067, -51.3207, -17.5515, 2.96421, -32.2332, -15.4188, 7.37155, -35.5022, -14.469, 6.81967, -19.192, 18.458, 1.51137, -42.8132, -9.8597, 7.08814, -47.8193, 7.06513, 7.32715, -9.06806, -16.4117, 6.78333, -23.0375, 25.5485, 4.71575, -13.2512, 14.8228, 8.48604, -18.1971, -7.01855, 7.87123, -45.9071, -1.95466, 7.71415, -50.0572, 23.6044, 8.24102, -32.4124, 25.1683, 7.65004, -39.7059, -3.00904, 7.93878, -14.2317, 1.53518, 1.08349, -18.8867, -12.383, 2.76136, -45.0239, 3.62091, 8.96771, -41.6225, 0.999327, 1.60437, -14.5034, -11.5994, 1.65996, -33.4591, 11.2544, 1.46662, -15.4725, 18.9413, 8.18743, -18.7912, -17.3635, 3.41637, -23.1353, 23.4107, 1.56505, -31.2601, -5.60729, 7.73764, -47.8854, 8.03082, 4.51305, -4.97512, -1.55633, 6.78035, -53.975, 19.7069, 7.32849, -48.8016, 0.436358, 9.22403, -29.0278, -0.0805104, 1.15267, -43.663, 17.8395, 7.57878, -48.8538, -1.468, 7.38285, -51.849, -12.2103, 6.86852, -16.2225, 0.158685, 1.26089, -17.6139, 31.9751, 5.24707, -36.6103, -2.50795, 8.88949, -39.1139, 6.44606, 7.06374, -8.10832, -4.99658, 0.973774, -35.725, 16.0996, 8.93168, -26.1584, 2.60863, 6.96124, -54.4409, 5.86921, 1.00536, -43.6146, 16.4591, 1.54474, -44.9134, 11.4258, 9.21357, -34.8838, 6.65038, 8.36743, -47.8346, -9.79801, 3.23135, -49.7382, -11.6328, 1.91708, -23.4603, 22.3166, 1.5882, -37.7286, 22.0337, 7.93206, -42.3405, 1.41113, 9.17105, -25.5111, 7.81043, 9.29708, -27.7141, 15.8662, 1.59131, -45.7137, -2.11833, 7.55688, -11.6854, -1.83582, 9.11788, -28.8065, 22.5175, 7.84877, -20.001, 16.8477, 2.66616, -11.1292, 19.949, 6.56812, -10.9519, 2.09657, 9.28481, -32.8937, 21.9463, 8.34657, -25.6024, -4.69448, 8.43224, -19.3323, 6.30354, 0.50108, -32.8482, 1.00858, 9.0378, -22.9651, 8.85229, 5.90148, -5.59526, 23.5405, 8.25262, -30.2896, 10.763, 0.645236, -26.0826, -2.89028, 1.06805, -40.6036, 13.8957, 8.65172, -43.2148, -7.80152, 1.36734, -38.5728, -10.6434, 8.1811, -25.0965, -6.92648, 1.40655, -40.6366, 15.6476, 6.92976, -9.68404, 22.3146, 2.65153, -15.2654, -1.51518, 3.31102, -54.6353, 28.0453, 3.069, -41.2236, 9.62157, 1.91269, -50.3283, -12.8402, 1.84382, -31.5208, -1.61366, 1.53342, -46.3848, 30.4754, 4.87297, -20.8609, -4.36615, 8.8579, -37.2428, 23.0216, 2.16362, -43.235, 3.44946, 2.82489, -8.10543, 8.60496, 9.02801, -40.8374, 21.0723, 1.27537, -29.4521, 2.30692, 7.59075, -51.9598, -3.66703, 0.852971, -34.8044, 1.45202, 3.39411, -55.608, 1.26861, 6.88303, -54.4138, -1.18822, 8.73436, -42.4372, 23.6353, 1.599, -30.3194, 20.5523, 1.45335, -39.2692, -5.52723, 2.74614, -51.1112, 11.1574, 1.9876, -50.4381, -6.12718, 0.99743, -31.0208, 10.082, 9.26506, -34.5549, 19.1849, 1.06709, -31.0534, 21.2142, 2.64496, -14.2419, 15.0639, 4.34711, -6.54174, -13.9282, 4.24886, -14.5179, 14.3004, 9.11397, -29.004, 5.64224, 0.567151, -36.171, -4.28926, 7.59448, -12.9471, -14.422, 2.46643, -39.0171, -8.84253, 1.89996, -19.0633, 15.1667, 0.900757, -24.7641, 30.9745, 5.44284, -39.87, -15.2856, 7.47262, -28.5519, 14.7786, 2.04266, -49.4369, 13.151, 0.668208, -33.8839, 5.70683, 9.28957, -35.4098, 27.0587, 7.56359, -27.5925, -19.3824, 5.94305, -28.1185, 12.122, 0.713482, -25.5342, 13.6023, 1.2181, -43.7372, -7.98938, 1.2607, -35.8457, 18.2064, 1.32027, -40.8189, -4.0909, 8.98745, -29.3681, -6.31201, 7.28905, -49.7434, 18.9831, 8.53486, -22.9847, -15.6746, 6.03888, -44.5832, 2.28281, 9.07587, -23.0104, 9.01095, 8.95448, -20.7541, -17.9457, 3.52436, -38.2005, 13.977, 6.80364, -8.60268, 0.535879, 1.73084, -48.7181, 7.57181, 0.608633, -25.4003, -19.5358, 4.83697, -25.0204, 0.752239, 0.722855, -24.8074, 0.137896, 8.84347, -20.5477, 9.63033, 4.01893, -56.9042, -10.1232, 2.50083, -16.2207, 18.3638, 1.91823, -46.3639, 25.2333, 7.27499, -19.506, -1.42376, 0.700751, -28.624, 19.2296, 1.07717, -32.4807, 4.62293, 0.616054, -37.2324, 15.7519, 0.954812, -38.1022, 12.1918, 7.58181, -10.9973, -20.1566, 4.52391, -31.7022, -1.19846, 2.20089, -11.7178, 2.52706, 7.76019, -11.2864, -8.7379, 8.56041, -29.2782, -6.76538, 1.13158, -35.7504, 6.1664, 9.34211, -32.2463, 0.41207, 0.963771, -41.6556, -13.959, 2.0675, -33.2847, 23.6189, 1.6195, -33.764, 4.85005, 6.69417, -7.03198, 31.5794, 4.42892, -37.9717, 4.47957, 2.05358, -11.1434, 7.2019, 9.2401, -36.8894, 20.4606, 8.25799, -21.4007, 9.34854, 7.22125, -53.6189, -6.56244, 5.69809, -8.53919, -18.5437, 3.48796, -27.1335, 0.701015, 0.754075, -24.1547, -7.98543, 7.11249, -13.1272, 5.80941, 7.86057, -11.4674, 16.653, 2.19704, -13.2183, -7.29418, 8.71916, -32.8642, -8.40354, 1.53499, -22.3759, -9.12227, 1.3166, -29.8453, -6.1227, 1.01043, -33.1544, 11.5224, 4.34807, -56.9098, 4.94721, 1.05151, -44.0356, 3.24797, 1.0876, -44.1436, 17.0266, 7.91624, -15.0992, 7.46296, 1.13613, -17.5685, 25.9077, 4.01336, -14.5074, -10.6884, 1.5086, -31.6803, 13.2729, 0.655125, -31.9925, 19.0218, 6.56275, -52.1555, -16.0925, 2.57423, -33.9444, 19.8013, 8.06622, -43.9108, -10.3664, 7.52971, -44.7644, 12.1629, 0.726049, -25.2675, -8.79952, 2.34736, -15.7399, -4.26831, 2.77982, -51.909, -14.6661, 5.95172, -16.1213, -11.3342, 8.21798, -29.1469, 24.5913, 6.4761, -47.7865, 10.7726, 8.94088, -21.204, 7.78668, 0.593223, -36.6214, -8.52292, 7.32175, -14.5778, 9.1609, 2.01709, -11.4479, 26.799, 2.29084, -36.5422, -2.27189, 8.93278, -38.5169, 2.84473, 6.82092, -7.56706, 4.48507, 7.56565, -10.1097, -8.90366, 2.24834, -16.4977, 6.106, 9.34105, -32.3785, 5.36936, 2.3271, -9.78579, 21.1351, 1.55949, -39.7294, 13.6033, 8.18097, -47.5137, -0.422428, 1.99635, -12.4641, 28.6886, 7.11879, -26.7612, 27.4383, 4.09822, -16.3244, 0.0960915, 8.83912, -20.519, -16.3134, 7.23043, -29.4597, -5.25752, 1.37417, -20.2673, -6.29411, 7.98774, -45.6459, -3.54969, 1.42505, -18.1807, 1.49229, 9.17973, -36.7547, -9.49271, 7.60858, -17.237, 9.43837, 1.63594, -48.6657, 18.6958, 7.33547, -49.4987, -18.3892, 6.55265, -30.1274, 14.6252, 8.92575, -38.6355, -1.0673, 2.10251, -50.319, -4.69744, 2.6213, -11.4224, 6.43067, 0.49028, -31.2115, -3.65031, 8.16306, -46.3308, 10.1388, 2.01424, -11.6603, 23.4659, 2.24079, -19.2464, -0.337495, 1.39166, -45.84, 25.8175, 2.29261, -23.0511, 9.94241, 0.705887, -38.4198, 8.66508, 3.58381, -56.3161, 25.7603, 7.60359, -38.858, 26.6346, 6.68835, -44.2378, 30.0889, 3.25743, -36.5198, 0.183667, 9.06307, -24.1042, 9.52434, 9.06515, -39.8853, 29.6382, 6.75997, -36.5878, -1.69637, 8.21406, -47.0519, -13.022, 4.07674, -48.7318, -14.2336, 7.70864, -33.4838, 19.5998, 6.93918, -50.5461, -4.17441, 0.896236, -27.4087, 23.3746, 6.74428, -14.3587, -8.89032, 1.84028, -19.6537, 9.69139, 8.71935, -18.1421, 15.7888, 2.69234, -52.011, 7.44904, 6.17511, -56.5703, 31.0084, 4.21784, -23.1851, 12.4312, 1.87512, -49.3896, -11.3588, 4.47959, -50.8673, 9.60457, 9.20078, -25.4654, -10.1906, 5.30766, -51.8724, -1.01806, 3.7753, -55.7462, -7.49802, 8.4902, -23.6784, 28.9762, 2.73529, -28.0187, -10.3003, 2.28709, -17.7901, 31.0453, 3.43575, -32.9306, 11.6284, 0.586985, -31.5879, 21.0621, 1.26174, -30.7531, 14.8148, 1.51746, -16.6842, -5.40549, 7.51013, -13.1708, 7.0928, 2.45, -9.303, -6.9322, 8.71285, -27.4985, 25.0878, 2.60492, -18.9971, 21.7429, 8.48234, -29.3621, 7.8145, 0.875621, -20.6042, -14.3691, 6.91983, -42.8307, 22.639, 1.66436, -24.1538, 28.7307, 2.7438, -26.5865, -7.80592, 7.57332, -47.1364, 22.8156, 2.10605, -43.0571, -12.8912, 7.39123, -20.3828, 7.48534, 6.83825, -55.0443, 30.6718, 3.82674, -38.7427, 16.3022, 0.829182, -30.6845, 0.228725, 8.92939, -21.7566, 6.94798, 8.61977, -16.7115, 0.176287, 7.62609, -51.2715, -9.88105, 2.55587, -46.7886, 8.4901, 6.47191, -55.8835, 16.1953, 2.17037, -49.366, -14.3871, 7.62, -35.2259, 29.0293, 4.91013, -17.9385, 7.9518, 1.55143, -14.1821, 16.9071, 6.91059, -10.2137, -9.58122, 1.4151, -27.4998, -1.81365, 8.47871, -44.7857, 3.12224, 8.1524, -13.4159, -13.7565, 7.43966, -39.9572, 20.4093, 8.6449, -29.7389, 25.1707, 7.61257, -40.1548, 2.11843, 1.15024, -17.9655, -17.2528, 6.69214, -24.9688, -11.1162, 1.57138, -30.5949, 2.05903, 9.01846, -40.3807, -9.51202, 1.96391, -19.301, 24.9758, 1.82072, -32.8559, 5.76496, 0.541943, -27.3451, -13.866, 6.31737, -46.3723, 4.16976, 0.653189, -38.0493, -17.1686, 6.93446, -28.1602, -16.9118, 3.41792, -21.9452, -6.78702, 2.11509, -15.4104, -11.5142, 4.82469, -11.5549, 25.9624, 7.69771, -36.8623, -7.92646, 8.12053, -42.8943, 13.4118, 7.59163, -11.427, 5.74306, 0.620109, -37.5109, 18.4343, 6.35655, -53.0575, 7.51846, 3.77598, -5.70542, 12.6357, 7.28008, -52.6366, -1.48319, 0.745377, -35.5832, -7.79363, 1.26391, -36.4901, 28.592, 6.05218, -18.9742, 7.22517, 0.529052, -34.4481, 3.7256, 9.17652, -38.1345, 0.572993, 9.2145, -34.2952, -12.0459, 6.5233, -14.613, 17.3095, 1.79602, -16.1558, 20.7448, 3.56066, -51.763, 4.11737, 7.86332, -11.5905, -7.20435, 1.18953, -36.2729, -5.48008, 8.54125, -21.49, 2.24859, 7.12808, -53.8435, -10.7892, 8.02784, -23.0379, 12.3523, 8.32214, -15.4992, -2.5878, 8.803, -22.0521, -12.8627, 2.06162, -38.0753, 4.49096, 0.53773, -27.8956, 30.8239, 5.95688, -23.9201, 21.9396, 8.41749, -35.1046, -7.23171, 1.17624, -35.8032, 20.7896, 6.44401, -11.1611, 2.89278, 8.75054, -18.4084, 2.67254, 9.30326, -32.2147, -13.3586, 2.44091, -21.2981, 9.29339, 7.54734, -10.1683, -8.56301, 8.57391, -28.8318, -0.891369, 0.692294, -34.7432, 22.0927, 2.09072, -18.5846, 22.4592, 1.9149, -20.6831, -6.48505, 1.24226, -38.8076, -6.00108, 2.38018, -13.3044, 24.2405, 2.18146, -20.9951, 9.18337, 0.677134, -24.243, 16.8024, 6.70683, -52.9818, -1.36374, 2.60018, -52.4775, 22.1127, 7.68046, -44.3665, -6.04699, 2.45725, -49.4961, -13.2234, 7.6285, -23.4399, -6.25422, 1.28725, -22.6403, 22.0407, 8.44895, -29.5387, 7.74386, 0.531562, -28.1315, 10.7573, 1.07114, -19.003, 13.3587, 0.765635, -25.5877, 3.13995, 0.753053, -22.8316 )
+emission_colors = PoolColorArray( 0.976471, 0, 0, 1, 0.027451, 0, 0, 1, 0, 1, 0.984314, 1, 0.176471, 0.25098, 0, 1, 1, 0, 0.839216, 1 )
+spread = 0.0
+flatness = 1.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 8.0
+initial_velocity_random = 0.1
+scale_amount = 2.0
+scale_amount_random = 0.8
+
+[node name="WLPos" type="Position3D" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8095, 16.0632, -1.92221 )
+
+[node name="Rock2" type="MeshInstance" parent="World"]
+transform = Transform( 0.319715, 0, 0.947514, 0, 1, 0, -0.947514, 0, 0.319715, 11.5594, 0.880862, 8.37488 )
+mesh = ExtResource( 6 )
+material/0 = null
+
+[node name="Rock3" type="MeshInstance" parent="World"]
+transform = Transform( 0.953787, 0, -0.300484, 0, 1, 0, 0.300484, 0, 0.953787, 5.04525, 0.880862, -13.5096 )
+mesh = ExtResource( 6 )
+material/0 = null
+
+[node name="Rock4" type="MeshInstance" parent="World"]
+transform = Transform( -0.975959, 0, 0.217956, 0, 1, 0, -0.217956, 0, -0.975959, -21.6107, 0.880862, 10.6881 )
+mesh = ExtResource( 6 )
+material/0 = null
+
+[node name="Rock" type="MeshInstance" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.90825, 0.884954, 22.9481 )
+mesh = ExtResource( 7 )
+material/0 = null
 
 [node name="GUI" type="CanvasLayer" parent="."]
-script = SubResource( 3 )
+script = SubResource( 6 )
 wood_count = NodePath("UpperPanel/Wood/Count")
 gold_count = NodePath("UpperPanel/Coin/Count")
 
@@ -242,17 +269,6 @@ editor/display_folded = true
 margin_right = 248.0
 margin_bottom = 126.0
 
-[node name="Texture" type="TextureRect" parent="GUI/UpperPanel/Wood"]
-margin_left = 18.4628
-margin_top = 8.53801
-margin_right = 84.4628
-margin_bottom = 82.538
-rect_rotation = 41.4395
-rect_pivot_offset = Vector2( 31.7105, 37.8098 )
-texture = ExtResource( 5 )
-expand = true
-stretch_mode = 6
-
 [node name="Count" type="Label" parent="GUI/UpperPanel/Wood"]
 margin_left = 94.664
 margin_top = 22.656
@@ -263,6 +279,19 @@ custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 5
 text = "0"
+
+[node name="Texture" type="TextureRect" parent="GUI/UpperPanel/Wood"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 3.25804
+margin_top = -52.9192
+margin_right = 96.258
+margin_bottom = 17.0808
+rect_rotation = 50.5159
+rect_pivot_offset = Vector2( 47.1429, 35.9576 )
+texture = ExtResource( 8 )
+expand = true
+stretch_mode = 6
 
 [node name="Coin" type="Control" parent="GUI/UpperPanel"]
 editor/display_folded = true
@@ -282,7 +311,7 @@ margin_right = 85.2128
 margin_bottom = 79.5379
 rect_rotation = -2.1646
 rect_pivot_offset = Vector2( 31.7105, 37.8098 )
-texture = ExtResource( 6 )
+texture = ExtResource( 9 )
 expand = true
 stretch_mode = 6
 
@@ -323,7 +352,7 @@ margin_left = -56.3488
 margin_top = -36.8221
 margin_right = 31.6512
 margin_bottom = 28.1779
-texture = ExtResource( 7 )
+texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
 
@@ -336,7 +365,7 @@ margin_left = -28.564
 margin_top = -38.057
 margin_right = 59.436
 margin_bottom = 26.943
-texture = ExtResource( 7 )
+texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
 
@@ -349,7 +378,7 @@ margin_left = -44.0
 margin_top = -32.5
 margin_right = 44.0
 margin_bottom = 32.5
-texture = ExtResource( 7 )
+texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
 
@@ -369,10 +398,15 @@ custom_constants/shadow_as_outline = 5
 text = "0"
 
 [node name="TreeHealth" type="Control" parent="GUI/UpperPanel"]
+editor/display_folded = true
+anchor_left = 0.5
 anchor_top = 1.0
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
-margin_top = -43.0
+margin_left = -358.708
+margin_top = -24.9069
+margin_right = 361.292
+margin_bottom = 18.0931
 
 [node name="Bar" type="TextureProgress" parent="GUI/UpperPanel/TreeHealth"]
 anchor_left = 0.5
@@ -385,8 +419,8 @@ margin_right = 340.0
 margin_bottom = 20.0
 max_value = 5.0
 value = 5.0
-texture_under = ExtResource( 8 )
-texture_progress = ExtResource( 8 )
+texture_under = ExtResource( 11 )
+texture_progress = ExtResource( 11 )
 tint_progress = Color( 0.337255, 1, 0, 1 )
 nine_patch_stretch = true
 
@@ -395,12 +429,11 @@ margin_left = 8.01628
 margin_top = -11.9837
 margin_right = 97.0163
 margin_bottom = 53.0163
-texture = ExtResource( 7 )
+texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
 
 [node name="MiddlePanel" type="Control" parent="GUI"]
-editor/display_folded = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -411,75 +444,64 @@ margin_right = 362.0
 margin_bottom = 483.5
 mouse_filter = 2
 
-[node name="WoodLog" type="Control" parent="GUI/MiddlePanel"]
-editor/display_folded = true
-visible = false
-modulate = Color( 1, 1, 1, 0 )
-margin_left = 270.0
-margin_top = 365.0
-margin_right = 516.0
-margin_bottom = 511.0
-mouse_filter = 2
-
-[node name="Texture" type="TextureRect" parent="GUI/MiddlePanel/WoodLog"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -105.796
-margin_top = -81.0
-margin_right = 56.2045
-margin_bottom = 81.0
-rect_rotation = 47.0359
-rect_pivot_offset = Vector2( 83.3134, 85.448 )
-texture = ExtResource( 5 )
-expand = true
-stretch_mode = 6
-
-[node name="Label" type="Label" parent="GUI/MiddlePanel/WoodLog"]
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-margin_left = -47.0
-margin_top = -37.0
-margin_right = -15.0
-margin_bottom = -18.0
-rect_scale = Vector2( 3, 3 )
-custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_as_outline = 5
-text = "+1"
-
-[node name="Anim" type="AnimationPlayer" parent="GUI/MiddlePanel/WoodLog"]
-anims/Chop = SubResource( 4 )
-
 [node name="ClickArea" type="Control" parent="GUI/MiddlePanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = -1.29236
+margin_bottom = -1.29236
+
+[node name="Shop" type="Control" parent="GUI/MiddlePanel"]
+editor/display_folded = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = SubResource( 8 )
+
+[node name="Backpanel" type="Panel" parent="GUI/MiddlePanel/Shop"]
+editor/display_folded = true
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="SellWL" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
+margin_left = 235.814
+margin_top = 200.954
+margin_right = 475.814
+margin_bottom = 327.954
+text = "SELL WOODEN LOG"
+
+[node name="Close" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
+margin_left = 633.899
+margin_top = 12.8483
+margin_right = 709.899
+margin_bottom = 77.8483
+text = "X"
 
 [node name="LowerPanel" type="Control" parent="GUI"]
+editor/display_folded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -160.0
-mouse_filter = 2
+mouse_filter = 1
 
 [node name="BackroundPanel" type="Panel" parent="GUI/LowerPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
-custom_styles/panel = SubResource( 5 )
+mouse_filter = 1
+custom_styles/panel = SubResource( 7 )
 
 [node name="ExitButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
 editor/display_folded = true
+self_modulate = Color( 0.937255, 0.188235, 0.188235, 1 )
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 187.984
-margin_top = -56.0
-margin_right = 535.984
-margin_bottom = 65.0
-texture_normal = ExtResource( 8 )
+margin_left = 15.0
+margin_top = -61.0
+margin_right = 161.0
+margin_bottom = 60.0
+button_mask = 3
+texture_normal = ExtResource( 11 )
 expand = true
 
 [node name="Label" type="Label" parent="GUI/LowerPanel/BackroundPanel/ExitButton"]
@@ -495,11 +517,40 @@ rect_scale = Vector2( 3, 3 )
 rect_pivot_offset = Vector2( 12.802, 6.80798 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "EXIT"
-[connection signal="on_new_tree" from="." to="GUI" method="_on_GameScene_on_new_tree"]
-[connection signal="on_tree_chopped" from="." to="GUI" method="_on_GameScene_on_tree_chopped"]
-[connection signal="on_tree_chopped" from="." to="Player" method="_on_GameScene_on_tree_chopped"]
-[connection signal="on_tree_down" from="." to="GUI" method="_on_GameScene_on_tree_down"]
-[connection signal="update_wood_count" from="." to="GUI" method="_on_GameScene_update_wood_count"]
-[connection signal="animation_finished" from="Grass/Anim" to="." method="_on_Anim_animation_finished"]
+
+[node name="ShopButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 332.0
+margin_top = -56.0
+margin_right = 536.0
+margin_bottom = 65.0
+button_mask = 3
+texture_normal = ExtResource( 11 )
+expand = true
+
+[node name="Label" type="Label" parent="GUI/LowerPanel/BackroundPanel/ShopButton"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -22.0811
+margin_top = -12.4415
+margin_right = 13.9189
+margin_bottom = 1.55847
+rect_scale = Vector2( 3, 3 )
+rect_pivot_offset = Vector2( 16.652, 5.23257 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "SHOP"
+[connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
+[connection signal="chop_tree" from="." to="World/Player" method="_on_GameScene_chop_tree"]
+[connection signal="new_tree" from="." to="GUI" method="_on_GameScene_new_tree"]
+[connection signal="on_gold_changed" from="." to="GUI" method="_on_GameScene_on_gold_changed"]
+[connection signal="on_wood_changed" from="." to="GUI" method="_on_GameScene_on_wood_changed"]
+[connection signal="tree_down" from="." to="GUI" method="_on_GameScene_tree_down"]
 [connection signal="gui_input" from="GUI/MiddlePanel/ClickArea" to="." method="_on_ClickArea_gui_input"]
+[connection signal="sell_wooden" from="GUI/MiddlePanel/Shop" to="." method="_on_Shop_sell_wooden"]
+[connection signal="button_down" from="GUI/MiddlePanel/Shop/Backpanel/SellWL" to="GUI/MiddlePanel/Shop" method="_on_SellWL_button_down"]
+[connection signal="button_down" from="GUI/MiddlePanel/Shop/Backpanel/Close" to="GUI/MiddlePanel/Shop" method="_on_Close_button_down"]
 [connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ExitButton" to="." method="_on_ExitButton_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ShopButton" to="GUI/MiddlePanel/Shop" method="_on_ShopButton_button_down"]

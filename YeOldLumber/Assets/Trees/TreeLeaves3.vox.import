@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/TreeLeaves3.vox-2d61178793dd8d8b214ab30545c321ac.mesh"
+
+[deps]
+
+source_file="res://Assets/Trees/TreeLeaves3.vox"
+dest_files=[ "res://.import/TreeLeaves3.vox-2d61178793dd8d8b214ab30545c321ac.mesh" ]
+
+[params]
+

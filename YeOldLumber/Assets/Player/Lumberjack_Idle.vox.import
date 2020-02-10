@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Lumberjack_Idle.vox-a721e542d9c55cffeff8c3c89be4436c.mesh"
+
+[deps]
+
+source_file="res://Assets/Player/Lumberjack_Idle.vox"
+dest_files=[ "res://.import/Lumberjack_Idle.vox-a721e542d9c55cffeff8c3c89be4436c.mesh" ]
+
+[params]
+

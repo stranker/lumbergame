@@ -1,39 +1,124 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://player.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Player/Lumberjack_Hit.vox" type="ArrayMesh" id=1]
+[ext_resource path="res://Assets/Player/Lumberjack_Hit2.vox" type="ArrayMesh" id=2]
+[ext_resource path="res://Assets/Player/Lumberjack_Hit3.vox" type="ArrayMesh" id=3]
+[ext_resource path="res://Assets/Player/Lumberjack_Idle.vox" type="ArrayMesh" id=4]
+[ext_resource path="res://Assets/Player/Lumberjack_Idle2.vox" type="ArrayMesh" id=5]
+[ext_resource path="res://Assets/Axe.vox" type="ArrayMesh" id=6]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends Sprite
+script/source = "extends Spatial
 
-func _on_GameScene_on_tree_chopped(axe_damage):
+func _on_GameScene_chop_tree(val):
 	if $Anim.is_playing():
 		$Anim.stop()
-	$Anim.play('Chop')
+	$Anim.play('Hit')
+	pass # Replace with function body.
+
+
+func _on_Anim_animation_finished(anim_name):
+	if anim_name == 'Hit':
+		$Anim.play('Idle')
 	pass # Replace with function body.
 "
 
 [sub_resource type="Animation" id=2]
-resource_name = "Chop"
-length = 0.5
+resource_name = "Hit"
+length = 0.3
 tracks/0/type = "value"
-tracks/0/path = NodePath(".:rotation_degrees")
+tracks/0/path = NodePath("Lumberjack:mesh")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.1, 0.2, 0.5 ),
-"transitions": PoolRealArray( 1, 0.5, 1, 1 ),
-"update": 0,
-"values": [ 0.0, 12.0484, -22.9817, 0.0 ]
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ ExtResource( 1 ), ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Hand:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ Vector3( 3.24296, 6.62287, 0.0292633 ), Vector3( 3.24296, 4.96703, 2.31654 ), Vector3( 3.24296, 2.37494, 1.43303 ), Vector3( 3.24296, 1.59987, -0.483265 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Hand:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ Vector3( -100, 0, 0 ), Vector3( -5.42996, 0, 0 ), Vector3( 36.4941, 0, 0 ), Vector3( 19.8649, 0, 0 ) ]
 }
 
-[node name="Player" type="Sprite"]
-position = Vector2( 2.96167, -2.65758 )
-scale = Vector2( 0.641456, 0.641456 )
-texture = ExtResource( 1 )
-offset = Vector2( -43.0723, -208.098 )
+[sub_resource type="Animation" id=3]
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Lumberjack:mesh")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ ExtResource( 4 ), ExtResource( 5 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Hand:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ Vector3( 3.24296, 1.90337, 0.0243049 ), Vector3( 3.09317, 2.92122, 0.0243049 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Hand:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 19.8649, 0, 0 ) ]
+}
+
+[node name="Player" type="Spatial"]
 script = SubResource( 1 )
 
+[node name="Lumberjack" type="MeshInstance" parent="."]
+mesh = ExtResource( 1 )
+material/0 = null
+
 [node name="Anim" type="AnimationPlayer" parent="."]
-anims/Chop = SubResource( 2 )
+autoplay = "Idle"
+anims/Hit = SubResource( 2 )
+anims/Idle = SubResource( 3 )
+
+[node name="Hand" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, -0.173648, 0.984807, 0, -0.984807, -0.173648, 3.24296, 6.62287, 0.0292633 )
+
+[node name="Axe" type="MeshInstance" parent="Hand"]
+transform = Transform( -0.123108, 0.983107, 0.135443, 0.548155, 0.181135, -0.816527, -0.827267, -0.0262778, -0.561194, -0.33197, 1.9586, 2.66758 )
+mesh = ExtResource( 6 )
+material/0 = null
+[connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]

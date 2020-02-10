@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/TreeTrunk3.vox-75616cb7d79a5ac7fa38ea845fc894f7.mesh"
+
+[deps]
+
+source_file="res://Assets/Trees/TreeTrunk3.vox"
+dest_files=[ "res://.import/TreeTrunk3.vox-75616cb7d79a5ac7fa38ea845fc894f7.mesh" ]
+
+[params]
+
