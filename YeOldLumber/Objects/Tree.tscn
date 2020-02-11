@@ -24,8 +24,10 @@ func _ready():
 	pass
 
 func randomize_tree():
+	randomize()
 	$TreeTrunk.mesh = trunk_array[randi() % trunk_array.size()]
 	$TreeTrunk/TreeLeaves.mesh = leaves_array[randi() % leaves_array.size()]
+	$TreeTrunk.rotate(Vector3.UP, rand_range(0,360))
 	pass
 
 func interpolate_fall():

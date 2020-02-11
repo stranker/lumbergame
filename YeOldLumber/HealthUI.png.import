@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/oie_transparent-2.png-045a551c6f7dabef381427124b8e0524.stex"
+path="res://.import/HealthUI.png-e267a3c19982cce33f2864019dec74d4.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://oie_transparent-2.png"
-dest_files=[ "res://.import/oie_transparent-2.png-045a551c6f7dabef381427124b8e0524.stex" ]
+source_file="res://HealthUI.png"
+dest_files=[ "res://.import/HealthUI.png-e267a3c19982cce33f2864019dec74d4.stex" ]
 
 [params]
 

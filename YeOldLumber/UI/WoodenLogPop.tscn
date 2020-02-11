@@ -1,0 +1,93 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _on_Anim_animation_finished(anim_name):
+	if anim_name == 'Fade':
+		queue_free()
+	pass # Replace with function body.
+"
+
+[sub_resource type="Animation" id=2]
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Texture:rect_position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.4 ),
+"transitions": PoolRealArray( 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 0, -3 ), Vector2( 0, -163 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Label:rect_position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.4 ),
+"transitions": PoolRealArray( 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 100, 10 ), Vector2( 100, -150 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.3, 0.7 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[node name="WoodenLogPop" type="Control"]
+margin_left = -80.0
+margin_top = -40.0
+margin_right = 90.0
+margin_bottom = 40.0
+rect_pivot_offset = Vector2( 80, 40 )
+script = SubResource( 1 )
+
+[node name="Texture" type="TextureRect" parent="."]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -203.0
+margin_right = 58.0
+margin_bottom = -117.0
+rect_rotation = 90.0
+rect_pivot_offset = Vector2( 40, 61 )
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 15.0
+margin_top = -190.0
+margin_right = 54.9999
+margin_bottom = -155.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "+1"
+valign = 1
+
+[node name="Anim" type="AnimationPlayer" parent="."]
+autoplay = "Fade"
+anims/Fade = SubResource( 2 )
+
+[node name="Tween" type="Tween" parent="."]
+[connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]
