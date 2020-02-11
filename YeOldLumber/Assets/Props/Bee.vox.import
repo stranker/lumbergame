@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Bee.vox-fcf38ffa675027db93acd6baa0a8744b.mesh"
+
+[deps]
+
+source_file="res://Assets/Props/Bee.vox"
+dest_files=[ "res://.import/Bee.vox-fcf38ffa675027db93acd6baa0a8744b.mesh" ]
+
+[params]
+

@@ -15,19 +15,21 @@ export var health : int = 5
 export (Array, Mesh) var trunk_array
 export (Array, Mesh) var leaves_array
 
+export (PackedScene) var wooden_log_scene
+
 signal tree_down
 signal on_chopped(health)
 
 
 func _ready():
+	randomize()
 	randomize_tree()
 	pass
 
 func randomize_tree():
-	randomize()
 	$TreeTrunk.mesh = trunk_array[randi() % trunk_array.size()]
 	$TreeTrunk/TreeLeaves.mesh = leaves_array[randi() % leaves_array.size()]
-	$TreeTrunk.rotate(Vector3.UP, rand_range(0,360))
+	$TreeTrunk/TreeLeaves.rotate(Vector3.UP, rand_range(0,360))
 	pass
 
 func interpolate_fall():

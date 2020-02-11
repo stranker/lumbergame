@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/FlowerWY.vox-b58c458df73408124f19e58ec1f01a24.mesh"
+
+[deps]
+
+source_file="res://Assets/Props/FlowerWY.vox"
+dest_files=[ "res://.import/FlowerWY.vox-b58c458df73408124f19e58ec1f01a24.mesh" ]
+
+[params]
+

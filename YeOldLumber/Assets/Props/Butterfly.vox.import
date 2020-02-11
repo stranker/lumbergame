@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Butterfly.vox-7a3350dcc29fdf20555d45204da24c76.mesh"
+
+[deps]
+
+source_file="res://Assets/Props/Butterfly.vox"
+dest_files=[ "res://.import/Butterfly.vox-7a3350dcc29fdf20555d45204da24c76.mesh" ]
+
+[params]
+

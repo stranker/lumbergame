@@ -5,9 +5,29 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
+signal on_wood_ui
+var wood_count : int = 0
+
 func _on_Anim_animation_finished(anim_name):
 	if anim_name == 'Fade':
-		queue_free()
+		travel_to_wood_ui()
+	pass # Replace with function body.
+
+func travel_to_wood_ui():
+	var final_pos = GameManager.wood_ui_pos + Vector2(-20,160)
+	$Travel.interpolate_property(self, 'rect_global_position', rect_global_position, final_pos,
+	0.5, Tween.TRANS_EXPO, Tween.EASE_OUT)
+	$Travel.start()
+	pass
+
+func set_wood_count(value):
+	wood_count = value
+	$Label.text = '+' + str(wood_count)
+	pass
+
+func _on_Travel_tween_all_completed():
+	emit_signal('on_wood_ui', wood_count)
+	queue_free()
 	pass # Replace with function body.
 "
 
@@ -51,6 +71,7 @@ tracks/2/keys = {
 }
 
 [node name="WoodenLogPop" type="Control"]
+modulate = Color( 1, 1, 1, 0 )
 margin_left = -80.0
 margin_top = -40.0
 margin_right = 90.0
@@ -61,9 +82,9 @@ script = SubResource( 1 )
 [node name="Texture" type="TextureRect" parent="."]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_top = -203.0
+margin_top = -43.0
 margin_right = 58.0
-margin_bottom = -117.0
+margin_bottom = 43.0
 rect_rotation = 90.0
 rect_pivot_offset = Vector2( 40, 61 )
 texture = ExtResource( 1 )
@@ -76,9 +97,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = 15.0
-margin_top = -190.0
+margin_top = -30.0
 margin_right = 54.9999
-margin_bottom = -155.0
+margin_bottom = 5.0
 rect_scale = Vector2( 2, 2 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 5
@@ -89,5 +110,6 @@ valign = 1
 autoplay = "Fade"
 anims/Fade = SubResource( 2 )
 
-[node name="Tween" type="Tween" parent="."]
+[node name="Travel" type="Tween" parent="."]
 [connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]
+[connection signal="tween_all_completed" from="Travel" to="." method="_on_Travel_tween_all_completed"]
