@@ -3,7 +3,7 @@
 [ext_resource path="res://Assets/Props/Butterfly.vox" type="ArrayMesh" id=1]
 [ext_resource path="res://Assets/Props/Butterfly2.vox" type="ArrayMesh" id=2]
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
 
 # Called when the node enters the scene tree for the first time.
@@ -20,13 +20,13 @@ func _ready():
 #	pass
 "
 
-[sub_resource type="Curve" id=1]
+[sub_resource type="Curve" id=2]
 min_value = -200.0
 max_value = 200.0
 _data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 0.201047, -167.64 ), 0.0, 0.0, 0, 0, Vector2( 0.43217, 11.88 ), 0.0, 0.0, 0, 0, Vector2( 0.587927, -86.68 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
 
 [node name="Butterflies" type="Spatial"]
-script = SubResource( 2 )
+script = SubResource( 1 )
 
 [node name="Particles" type="CPUParticles" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.33739, 0 )
@@ -46,7 +46,7 @@ gravity = Vector3( 0, 0, 0 )
 initial_velocity = 0.0
 radial_accel = -200.0
 radial_accel_random = 1.0
-radial_accel_curve = SubResource( 1 )
+radial_accel_curve = SubResource( 2 )
 tangential_accel = 500.0
 tangential_accel_random = 1.0
 scale_amount = 0.1
@@ -70,7 +70,7 @@ gravity = Vector3( 0, 0, 0 )
 initial_velocity = 0.0
 radial_accel = -200.0
 radial_accel_random = 1.0
-radial_accel_curve = SubResource( 1 )
+radial_accel_curve = SubResource( 2 )
 tangential_accel = 500.0
 tangential_accel_random = 1.0
 scale_amount = 0.1
