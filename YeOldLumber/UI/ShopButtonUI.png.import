@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg-34c3780411e1f42f55635a4c0793e31b.stex"
+path="res://.import/ShopButtonUI.png-c796e4db88c83b09e6cc4b8eefa6ada2.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg"
-dest_files=[ "res://.import/wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg-34c3780411e1f42f55635a4c0793e31b.stex" ]
+source_file="res://UI/ShopButtonUI.png"
+dest_files=[ "res://.import/ShopButtonUI.png-c796e4db88c83b09e6cc4b8eefa6ada2.stex" ]
 
 [params]
 

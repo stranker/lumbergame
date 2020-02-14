@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://Objects/Tree.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/ChopParticles.tscn" type="PackedScene" id=2]
@@ -13,12 +13,16 @@
 [ext_resource path="res://Assets/Rock2.vox" type="ArrayMesh" id=11]
 [ext_resource path="res://Assets/Rock.vox" type="ArrayMesh" id=12]
 [ext_resource path="res://UI/WoodenLogPop.tscn" type="PackedScene" id=13]
-[ext_resource path="res://HealthUI.png" type="Texture" id=14]
+[ext_resource path="res://UI/HealthUI.png" type="Texture" id=14]
 [ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=15]
 [ext_resource path="res://UI/CoinUI.png" type="Texture" id=16]
-[ext_resource path="res://TreeUI.png" type="Texture" id=17]
-[ext_resource path="res://wooden-texture-cartoon-sign-mockup-260nw-473578576.jpg" type="Texture" id=18]
-[ext_resource path="res://button.png" type="Texture" id=19]
+[ext_resource path="res://UI/TreeUI.png" type="Texture" id=17]
+[ext_resource path="res://UI/WoodPanelUI.png" type="Texture" id=18]
+[ext_resource path="res://UI/ExitButtonUI.png" type="Texture" id=19]
+[ext_resource path="res://UI/OptionsButtonUI.png" type="Texture" id=20]
+[ext_resource path="res://UI/InfoButtonUI.png" type="Texture" id=21]
+[ext_resource path="res://UI/ShopButtonUI.png" type="Texture" id=22]
+[ext_resource path="res://UI/CreditsButtonUI.png" type="Texture" id=23]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -274,7 +278,7 @@ func _on_ShopButton_button_down():
 
 [sub_resource type="StyleBoxTexture" id=18]
 texture = ExtResource( 18 )
-region_rect = Rect2( 0, 0, 300, 250 )
+region_rect = Rect2( 0, 0, 752, 233 )
 margin_bottom = 19.6576
 
 [node name="GameScene" type="Node"]
@@ -428,7 +432,6 @@ emission_points = PoolVector3Array( 3.62815, 3.72399, 20.6783, 3.19981, -0.12440
 gravity = Vector3( 0, -20, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
-angular_velocity = 0.0
 scale_amount = 0.2
 scale_amount_random = 1.0
 
@@ -445,7 +448,6 @@ spread = 0.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
-angular_velocity = 0.0
 linear_accel_random = 1.0
 scale_amount = 0.2
 scale_amount_random = 1.0
@@ -602,14 +604,15 @@ expand = true
 stretch_mode = 6
 
 [node name="MiddlePanel" type="Control" parent="GUI"]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -362.0
-margin_top = -483.5
+margin_top = -483.0
 margin_right = 362.0
-margin_bottom = 483.5
+margin_bottom = 471.0
 mouse_filter = 2
 
 [node name="WoodPopPos" type="Control" parent="GUI/MiddlePanel"]
@@ -629,12 +632,14 @@ margin_top = -1.29236
 margin_bottom = -1.29236
 
 [node name="Shop" type="Control" parent="GUI/MiddlePanel"]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = SubResource( 17 )
 
 [node name="Backpanel" type="Panel" parent="GUI/MiddlePanel/Shop"]
+editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -682,11 +687,10 @@ margin_bottom = 77.8483
 text = "X"
 
 [node name="LowerPanel" type="Control" parent="GUI"]
-editor/display_folded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -160.0
+margin_top = -169.0
 mouse_filter = 1
 
 [node name="BackroundPanel" type="Panel" parent="GUI/LowerPanel"]
@@ -696,44 +700,56 @@ mouse_filter = 1
 custom_styles/panel = SubResource( 18 )
 
 [node name="ExitButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
-editor/display_folded = true
-self_modulate = Color( 0.937255, 0.188235, 0.188235, 1 )
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 15.0
-margin_top = -61.0
-margin_right = 161.0
-margin_bottom = 60.0
+margin_left = 48.0
+margin_top = -89.5
+margin_right = 190.0
+margin_bottom = 35.5
 button_mask = 3
 texture_normal = ExtResource( 19 )
 expand = true
+stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/LowerPanel/BackroundPanel/ExitButton"]
-anchor_left = 0.5
+[node name="OptionsButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
 anchor_top = 0.5
-anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -13.5
-margin_top = -7.0
-margin_right = 13.5
-margin_bottom = 7.0
-rect_scale = Vector2( 3, 3 )
-rect_pivot_offset = Vector2( 12.802, 6.80798 )
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-text = "EXIT"
+margin_left = 50.0
+margin_top = -22.4066
+margin_right = 145.0
+margin_bottom = 88.5934
+button_mask = 3
+texture_normal = ExtResource( 20 )
+expand = true
+stretch_mode = 5
+
+[node name="InfoButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 510.0
+margin_top = -90.0
+margin_right = 605.0
+margin_bottom = 21.0
+button_mask = 3
+texture_normal = ExtResource( 21 )
+expand = true
+stretch_mode = 5
 
 [node name="ShopButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
+editor/display_folded = true
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 332.0
-margin_top = -56.0
-margin_right = 536.0
-margin_bottom = 65.0
+margin_left = 250.0
+margin_top = -65.5
+margin_right = 480.0
+margin_bottom = 55.5
 button_mask = 3
-texture_normal = ExtResource( 19 )
+texture_normal = ExtResource( 22 )
 expand = true
+stretch_mode = 5
 
 [node name="Label" type="Label" parent="GUI/LowerPanel/BackroundPanel/ShopButton"]
+visible = false
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -746,8 +762,22 @@ rect_scale = Vector2( 3, 3 )
 rect_pivot_offset = Vector2( 16.652, 5.23257 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "SHOP"
-[connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
+
+[node name="CreditsButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -130.0
+margin_top = -107.0
+margin_right = -55.0
+margin_bottom = -9.0
+button_mask = 3
+texture_normal = ExtResource( 23 )
+expand = true
+stretch_mode = 5
 [connection signal="chop_tree" from="." to="World/Player" method="_on_GameScene_chop_tree"]
+[connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
 [connection signal="new_tree" from="." to="GUI" method="_on_GameScene_new_tree"]
 [connection signal="on_gold_changed" from="." to="GUI" method="_on_GameScene_on_gold_changed"]
 [connection signal="on_wood_changed" from="." to="GUI" method="_on_GameScene_on_wood_changed"]
@@ -757,4 +787,7 @@ text = "SHOP"
 [connection signal="gui_input" from="GUI/MiddlePanel/ClickArea" to="." method="_on_ClickArea_gui_input"]
 [connection signal="button_down" from="GUI/MiddlePanel/Shop/Backpanel/Close" to="GUI/MiddlePanel/Shop" method="_on_Close_button_down"]
 [connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ExitButton" to="." method="_on_ExitButton_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/OptionsButton" to="." method="_on_ExitButton_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/InfoButton" to="." method="_on_ExitButton_button_down"]
 [connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ShopButton" to="GUI/MiddlePanel/Shop" method="_on_ShopButton_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/CreditsButton" to="." method="_on_ExitButton_button_down"]
