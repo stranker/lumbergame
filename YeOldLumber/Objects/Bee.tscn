@@ -5,7 +5,8 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
 
-export (Array, NodePath) var flowers
+export (NodePath) var flowers_parent_path
+onready var flowers = get_node(flowers_parent_path).get_children()
 var travel_duration : float
 var idle_duration : float
 var current_flower = null
@@ -29,7 +30,7 @@ func go_to_random_flower():
 	while current_flower == flower:
 		flower = flowers[randi() % flowers.size()]
 	current_flower = flower
-	var flower_pos : Vector3 = get_node(flower).translation + Vector3.UP * 1
+	var flower_pos : Vector3 = flower.translation + Vector3.UP * 1
 	look_at_from_position(translation, flower_pos, Vector3.UP)
 	$Travel.remove_all()
 	$Travel.interpolate_property(self,'translation', translation, flower_pos, travel_duration,
