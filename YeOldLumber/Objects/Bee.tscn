@@ -5,8 +5,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
 
-export (NodePath) var flowers_parent_path
-onready var flowers = get_node(flowers_parent_path)
+export (Array, NodePath) var flowers
 var travel_duration : float
 var idle_duration : float
 var current_flower = null
@@ -26,11 +25,11 @@ func random_pos():
 func go_to_random_flower():
 	travel_duration = rand_range(7,8)
 	idle_duration = rand_range(2,3)
-	var flower = flowers.get_children()[randi() % flowers.get_child_count()]
+	var flower = flowers[randi() % flowers.size()]
 	while current_flower == flower:
-		flower = flowers.get_children()[randi() % flowers.get_child_count()]
+		flower = flowers[randi() % flowers.size()]
 	current_flower = flower
-	var flower_pos : Vector3 = flower.translation + Vector3.UP * 1
+	var flower_pos : Vector3 = get_node(flower).translation + Vector3.UP * 1
 	look_at_from_position(translation, flower_pos, Vector3.UP)
 	$Travel.remove_all()
 	$Travel.interpolate_property(self,'translation', translation, flower_pos, travel_duration,
@@ -63,7 +62,7 @@ tracks/0/keys = {
 script = SubResource( 1 )
 
 [node name="Bee" type="MeshInstance" parent="."]
-transform = Transform( -0.2, 0, -1.74846e-08, 0, 0.2, 0, 1.74846e-08, 0, -0.2, 0, -0.232112, 0 )
+transform = Transform( -0.2, 0, -1.74846e-008, 0, 0.2, 0, 1.74846e-008, 0, -0.2, 0, -0.232112, 0 )
 mesh = ExtResource( 1 )
 material/0 = null
 
