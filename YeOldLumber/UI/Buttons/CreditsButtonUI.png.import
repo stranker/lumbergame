@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/ShopButtonUI.png-c796e4db88c83b09e6cc4b8eefa6ada2.stex"
+path="res://.import/CreditsButtonUI.png-bdb7758b44e20d3e2d586346e3afd414.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://UI/ShopButtonUI.png"
-dest_files=[ "res://.import/ShopButtonUI.png-c796e4db88c83b09e6cc4b8eefa6ada2.stex" ]
+source_file="res://UI/Buttons/CreditsButtonUI.png"
+dest_files=[ "res://.import/CreditsButtonUI.png-bdb7758b44e20d3e2d586346e3afd414.stex" ]
 
 [params]
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/OptionsButtonUI.png-9d69eb11c447f6e3d905c5a4db70acd1.stex"
+path="res://.import/InfoButtonUI.png-c0eb47e7267012b8988445be145440ea.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://UI/OptionsButtonUI.png"
-dest_files=[ "res://.import/OptionsButtonUI.png-9d69eb11c447f6e3d905c5a4db70acd1.stex" ]
+source_file="res://UI/Buttons/InfoButtonUI.png"
+dest_files=[ "res://.import/InfoButtonUI.png-c0eb47e7267012b8988445be145440ea.stex" ]
 
 [params]
 
