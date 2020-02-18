@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://Objects/Tree.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/ChopParticles.tscn" type="PackedScene" id=2]
@@ -17,14 +17,13 @@
 [ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=15]
 [ext_resource path="res://UI/CoinUI.png" type="Texture" id=16]
 [ext_resource path="res://UI/TreeUI.png" type="Texture" id=17]
-[ext_resource path="res://UI/ShopPanel.png" type="Texture" id=18]
-[ext_resource path="res://UI/Charcoal.png" type="Texture" id=19]
-[ext_resource path="res://UI/WoodPanelUI.png" type="Texture" id=20]
-[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=21]
-[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=22]
-[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=23]
-[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=24]
-[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=25]
+[ext_resource path="res://Scenes/Shop.tscn" type="PackedScene" id=18]
+[ext_resource path="res://UI/WoodPanelUI.png" type="Texture" id=19]
+[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=20]
+[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=21]
+[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=22]
+[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=23]
+[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=24]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -260,30 +259,8 @@ tracks/0/keys = {
 "values": [ Vector2( 1, 1 ), Vector2( 1.5, 1.5 ), Vector2( 1, 1 ) ]
 }
 
-[sub_resource type="GDScript" id=17]
-script/source = "extends Control
-
-func _on_SellWL_button_down():
-	GameManager.sell_wooden()
-	pass # Replace with function body.
-
-
-func _on_Close_button_down():
-	$Backpanel.hide()
-	pass # Replace with function body.
-
-
-func _on_ShopButton_button_down():
-	$Backpanel.show()
-	pass # Replace with function body.
-"
-
 [sub_resource type="StyleBoxTexture" id=19]
-texture = ExtResource( 18 )
-region_rect = Rect2( 0, 0, 481, 710 )
-
-[sub_resource type="StyleBoxTexture" id=18]
-texture = ExtResource( 20 )
+texture = ExtResource( 19 )
 region_rect = Rect2( 0, 0, 752, 233 )
 margin_bottom = 19.6576
 
@@ -300,7 +277,7 @@ transform = Transform( 0.855718, 0, 0.517444, 0, 1, 0, -0.517444, 0, 0.855718, 0
 
 [node name="TreePos" type="Position3D" parent="World"]
 editor/display_folded = true
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4008, -7.62939e-006, 0.418063 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4008, -7.62939e-06, 0.418063 )
 
 [node name="ChopParticles" type="Position3D" parent="World/TreePos"]
 transform = Transform( -0.986097, 0, -0.166172, 0, 1, 0, 0.166172, 0, -0.986097, -2.55483, 4.62651, -1.24022 )
@@ -317,7 +294,7 @@ mesh = SubResource( 5 )
 material/0 = null
 
 [node name="Camera" type="Camera" parent="World"]
-transform = Transform( -4.37114e-008, -0.255277, 0.966868, 0, 0.966868, 0.255277, -1, 1.11585e-008, -4.22631e-008, 48.13, 24.68, 0 )
+transform = Transform( -4.37114e-08, -0.255277, 0.966868, 0, 0.966868, 0.255277, -1, 1.11585e-08, -4.22631e-08, 48.13, 24.68, 0 )
 environment = ExtResource( 4 )
 current = true
 fov = 82.5
@@ -335,7 +312,7 @@ flatness = 1.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 8.0
 initial_velocity_random = 0.1
-angular_velocity = 2.07241e+006
+angular_velocity = 2.07241e+06
 scale_amount = 2.5
 scale_amount_random = 1.0
 
@@ -438,6 +415,7 @@ emission_points = PoolVector3Array( 3.62815, 3.72399, 20.6783, 3.19981, -0.12440
 gravity = Vector3( 0, -20, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
+angular_velocity = 0.0
 scale_amount = 0.2
 scale_amount_random = 1.0
 
@@ -454,6 +432,7 @@ spread = 0.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
+angular_velocity = 0.0
 linear_accel_random = 1.0
 scale_amount = 0.2
 scale_amount_random = 1.0
@@ -642,66 +621,7 @@ anchor_bottom = 1.0
 margin_top = -1.29236
 margin_bottom = -1.29236
 
-[node name="Shop" type="Control" parent="GUI/MiddlePanel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-script = SubResource( 17 )
-
-[node name="Backpanel" type="Panel" parent="GUI/MiddlePanel/Shop"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -333.0
-margin_top = -448.5
-margin_right = 333.0
-margin_bottom = 448.5
-custom_styles/panel = SubResource( 19 )
-
-[node name="CharcoalButton" type="TextureButton" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 93.0
-margin_top = 185.0
-margin_right = 268.0
-margin_bottom = 357.0
-texture_normal = ExtResource( 19 )
-expand = true
-stretch_mode = 5
-
-[node name="PaperButton" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 282.0
-margin_top = 253.5
-margin_right = 398.0
-margin_bottom = 356.5
-text = "Paper"
-
-[node name="FurnitureButton" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 482.0
-margin_top = 253.5
-margin_right = 598.0
-margin_bottom = 356.5
-text = "Furniture"
-
-[node name="ConstructionButton" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 152.0
-margin_top = 483.5
-margin_right = 268.0
-margin_bottom = 586.5
-text = "Construction"
-
-[node name="BiodieselButton" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 385.455
-margin_top = 483.5
-margin_right = 501.455
-margin_bottom = 586.5
-text = "Biodiesel"
-
-[node name="Close" type="Button" parent="GUI/MiddlePanel/Shop/Backpanel"]
-margin_left = 633.899
-margin_top = 12.8483
-margin_right = 709.899
-margin_bottom = 77.8483
-text = "X"
+[node name="Shop" parent="GUI/MiddlePanel" instance=ExtResource( 18 )]
 
 [node name="LowerPanel" type="Control" parent="GUI"]
 editor/display_folded = true
@@ -718,7 +638,7 @@ __meta__ = {
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
-custom_styles/panel = SubResource( 18 )
+custom_styles/panel = SubResource( 19 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -731,7 +651,7 @@ margin_top = -45.5
 margin_right = 129.0
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 21 )
+texture_normal = ExtResource( 20 )
 expand = true
 stretch_mode = 5
 
@@ -743,7 +663,7 @@ margin_top = -45.5
 margin_right = 233.941
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 22 )
+texture_normal = ExtResource( 21 )
 expand = true
 stretch_mode = 5
 
@@ -758,7 +678,7 @@ margin_right = 115.0
 margin_bottom = -24.7733
 rect_pivot_offset = Vector2( 116.991, 62.903 )
 button_mask = 3
-texture_normal = ExtResource( 23 )
+texture_normal = ExtResource( 22 )
 expand = true
 stretch_mode = 5
 
@@ -770,7 +690,7 @@ margin_top = -45.5
 margin_right = 586.356
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 24 )
+texture_normal = ExtResource( 23 )
 expand = true
 stretch_mode = 5
 
@@ -784,11 +704,11 @@ margin_top = -132.143
 margin_right = -25.2112
 margin_bottom = -39.1431
 button_mask = 3
-texture_normal = ExtResource( 25 )
+texture_normal = ExtResource( 24 )
 expand = true
 stretch_mode = 5
-[connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
 [connection signal="chop_tree" from="." to="World/Player" method="_on_GameScene_chop_tree"]
+[connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
 [connection signal="new_tree" from="." to="GUI" method="_on_GameScene_new_tree"]
 [connection signal="on_gold_changed" from="." to="GUI" method="_on_GameScene_on_gold_changed"]
 [connection signal="on_wood_changed" from="." to="GUI" method="_on_GameScene_on_wood_changed"]
@@ -796,5 +716,4 @@ stretch_mode = 5
 [connection signal="is_raining" from="World/Enviroment/Rain" to="World/Enviroment" method="_on_Rain_is_raining"]
 [connection signal="timeout" from="World/Enviroment/Rain/RainTimer" to="World/Enviroment/Rain" method="_on_RainTimer_timeout"]
 [connection signal="gui_input" from="GUI/MiddlePanel/ClickArea" to="." method="_on_ClickArea_gui_input"]
-[connection signal="button_down" from="GUI/MiddlePanel/Shop/Backpanel/Close" to="GUI/MiddlePanel/Shop" method="_on_Close_button_down"]
 [connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ExitButton" to="." method="_on_ExitButton_button_down"]

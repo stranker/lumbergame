@@ -1,0 +1,80 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://UI/ShopPanel.png" type="Texture" id=1]
+[ext_resource path="res://UI/Charcoal.png" type="Texture" id=2]
+[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _on_Close_button_down():
+	$Backpanel.hide()
+	pass # Replace with function body."
+
+[sub_resource type="StyleBoxTexture" id=2]
+texture = ExtResource( 1 )
+region_rect = Rect2( 0, 0, 481, 710 )
+
+[node name="Shop" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = SubResource( 1 )
+
+[node name="Backpanel" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -333.0
+margin_top = -448.5
+margin_right = 333.0
+margin_bottom = 448.5
+custom_styles/panel = SubResource( 2 )
+
+[node name="CharcoalButton" type="TextureButton" parent="Backpanel"]
+margin_left = 93.0
+margin_top = 185.0
+margin_right = 268.0
+margin_bottom = 357.0
+texture_normal = ExtResource( 2 )
+expand = true
+stretch_mode = 5
+
+[node name="PaperButton" type="Button" parent="Backpanel"]
+margin_left = 282.0
+margin_top = 253.5
+margin_right = 398.0
+margin_bottom = 356.5
+text = "Paper"
+
+[node name="FurnitureButton" type="Button" parent="Backpanel"]
+margin_left = 482.0
+margin_top = 253.5
+margin_right = 598.0
+margin_bottom = 356.5
+text = "Furniture"
+
+[node name="ConstructionButton" type="Button" parent="Backpanel"]
+margin_left = 152.0
+margin_top = 483.5
+margin_right = 268.0
+margin_bottom = 586.5
+text = "Construction"
+
+[node name="BiodieselButton" type="Button" parent="Backpanel"]
+margin_left = 385.455
+margin_top = 483.5
+margin_right = 501.455
+margin_bottom = 586.5
+text = "Biodiesel"
+
+[node name="Close" type="TextureButton" parent="Backpanel"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -78.0
+margin_bottom = 80.0
+texture_normal = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+[connection signal="button_down" from="Backpanel/Close" to="." method="_on_Close_button_down"]
