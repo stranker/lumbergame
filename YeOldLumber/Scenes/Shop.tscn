@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://UI/ShopPanel.png" type="Texture" id=1]
 [ext_resource path="res://UI/Charcoal.png" type="Texture" id=2]
@@ -11,26 +11,24 @@ func _on_Close_button_down():
 	$Backpanel.hide()
 	pass # Replace with function body."
 
-[sub_resource type="StyleBoxTexture" id=2]
-texture = ExtResource( 1 )
-region_rect = Rect2( 0, 0, 481, 710 )
-
-[node name="Shop" type="Control"]
+[node name="PopPanel" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = SubResource( 1 )
 
-[node name="Backpanel" type="Panel" parent="."]
+[node name="Backpanel" type="TextureRect" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -333.0
-margin_top = -448.5
+margin_top = -448.0
 margin_right = 333.0
-margin_bottom = 448.5
-custom_styles/panel = SubResource( 2 )
+margin_bottom = 366.0
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 6
 
 [node name="CharcoalButton" type="TextureButton" parent="Backpanel"]
 margin_left = 93.0

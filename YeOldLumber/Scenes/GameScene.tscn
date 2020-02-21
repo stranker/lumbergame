@@ -13,17 +13,18 @@
 [ext_resource path="res://Assets/Rock2.vox" type="ArrayMesh" id=11]
 [ext_resource path="res://Assets/Rock.vox" type="ArrayMesh" id=12]
 [ext_resource path="res://UI/WoodenLogPop.tscn" type="PackedScene" id=13]
-[ext_resource path="res://UI/HealthUI.png" type="Texture" id=14]
-[ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=15]
-[ext_resource path="res://UI/CoinUI.png" type="Texture" id=16]
-[ext_resource path="res://UI/TreeUI.png" type="Texture" id=17]
-[ext_resource path="res://Scenes/Shop.tscn" type="PackedScene" id=18]
-[ext_resource path="res://UI/WoodPanelUI.png" type="Texture" id=19]
-[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=20]
-[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=21]
-[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=22]
-[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=23]
-[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=24]
+[ext_resource path="res://Scenes/HitMarker.tscn" type="PackedScene" id=14]
+[ext_resource path="res://UI/HealthUI.png" type="Texture" id=15]
+[ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=16]
+[ext_resource path="res://UI/CoinUI.png" type="Texture" id=17]
+[ext_resource path="res://UI/TreeUI.png" type="Texture" id=18]
+[ext_resource path="res://Scenes/PopPanel.tscn" type="PackedScene" id=19]
+[ext_resource path="res://UI/LowBoxPanel.png" type="Texture" id=20]
+[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=21]
+[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=22]
+[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=23]
+[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=24]
+[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=25]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -35,6 +36,7 @@ export (PackedScene) var particles_scene
 
 var current_tree
 
+signal player_chop
 signal chop_tree(damage)
 signal tree_down(trees_chopped)
 signal new_tree(tree)
@@ -59,11 +61,17 @@ func spawn_new_tree():
 
 func _on_ClickArea_gui_input(event):
 	if event is InputEventScreenTouch and !event.is_echo() and event.pressed:
+		spawn_hit(event.position)
+		emit_signal('player_chop')
 		if current_tree and current_tree.is_alive():
 			emit_signal('chop_tree',damage)
 			current_tree.take_chop(damage)
 			spawn_particles()
 	pass # Replace with function body.
+
+func spawn_hit(pos : Vector2):
+	$GUI.spawn_hit(pos)
+	pass
 
 func spawn_particles():
 	var part = particles_scene.instance()
@@ -78,11 +86,16 @@ func on_tree_chopped(health):
 func on_tree_down():
 	trees_chopped += 1
 	emit_signal('tree_down', trees_chopped)
-	spawn_new_tree()
+	$World/NewTreeTimer.start()
 	pass # Replace with function body.
 
 func _on_ExitButton_button_down():
 	get_tree().quit()
+	pass # Replace with function body.
+
+
+func _on_NewTreeTimer_timeout():
+	spawn_new_tree()
 	pass # Replace with function body.
 "
 
@@ -193,6 +206,7 @@ script/source = "extends CanvasLayer
 export (NodePath) var wood_count
 export (NodePath) var gold_count
 export (PackedScene) var wooden_scene
+export (PackedScene) var hit_scene
 
 func _ready():
 	GameManager.wood_ui_pos = $UpperPanel/Wood/Texture.rect_global_position
@@ -221,6 +235,12 @@ func spawn_wooden_pop(damage):
 	w.rect_global_position = $MiddlePanel/WoodPopPos.rect_global_position
 	w.set_wood_count(damage)
 	w.connect('on_wood_ui', self, 'on_wooden_log_ui')
+	pass
+
+func spawn_hit(pos : Vector2):
+	var hit = hit_scene.instance()
+	hit.rect_position = pos
+	$MiddlePanel/HitMarkers.add_child(hit)
 	pass
 
 func on_wooden_log_ui(wood):
@@ -259,11 +279,6 @@ tracks/0/keys = {
 "values": [ Vector2( 1, 1 ), Vector2( 1.5, 1.5 ), Vector2( 1, 1 ) ]
 }
 
-[sub_resource type="StyleBoxTexture" id=19]
-texture = ExtResource( 19 )
-region_rect = Rect2( 0, 0, 752, 233 )
-margin_bottom = 19.6576
-
 [node name="GameScene" type="Node"]
 script = SubResource( 1 )
 tree_scene = ExtResource( 1 )
@@ -274,6 +289,10 @@ editor/display_folded = true
 
 [node name="Player" parent="World" instance=ExtResource( 3 )]
 transform = Transform( 0.855718, 0, 0.517444, 0, 1, 0, -0.517444, 0, 0.855718, 0.418161, 1.00931, -6.28444 )
+
+[node name="NewTreeTimer" type="Timer" parent="World"]
+wait_time = 0.2
+one_shot = true
 
 [node name="TreePos" type="Position3D" parent="World"]
 editor/display_folded = true
@@ -445,6 +464,7 @@ script = SubResource( 15 )
 wood_count = NodePath("UpperPanel/Wood/Count")
 gold_count = NodePath("UpperPanel/Coin/Count")
 wooden_scene = ExtResource( 13 )
+hit_scene = ExtResource( 14 )
 
 [node name="UpperPanel" type="Control" parent="GUI"]
 editor/display_folded = true
@@ -476,8 +496,8 @@ margin_right = 340.0
 margin_bottom = 20.0
 max_value = 5.0
 value = 5.0
-texture_under = ExtResource( 14 )
-texture_progress = ExtResource( 14 )
+texture_under = ExtResource( 15 )
+texture_progress = ExtResource( 15 )
 tint_under = Color( 1, 0, 0, 1 )
 nine_patch_stretch = true
 
@@ -511,7 +531,7 @@ margin_right = 93.0
 margin_bottom = 35.0
 rect_rotation = 50.5159
 rect_pivot_offset = Vector2( 47.1429, 35.9576 )
-texture = ExtResource( 15 )
+texture = ExtResource( 16 )
 expand = true
 stretch_mode = 6
 
@@ -536,7 +556,7 @@ margin_top = -37.0
 margin_right = 66.0
 margin_bottom = 37.0
 rect_pivot_offset = Vector2( 31.7105, 37.8098 )
-texture = ExtResource( 16 )
+texture = ExtResource( 17 )
 expand = true
 stretch_mode = 6
 
@@ -587,7 +607,7 @@ margin_top = -32.5
 margin_right = 71.0
 margin_bottom = 32.5
 rect_pivot_offset = Vector2( 45.0019, 38.4583 )
-texture = ExtResource( 17 )
+texture = ExtResource( 18 )
 expand = true
 stretch_mode = 6
 
@@ -614,6 +634,12 @@ margin_left = 36.0
 margin_top = 30.0
 margin_right = 46.0
 margin_bottom = 40.0
+mouse_filter = 2
+
+[node name="HitMarkers" type="Control" parent="GUI/MiddlePanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 
 [node name="ClickArea" type="Control" parent="GUI/MiddlePanel"]
 anchor_right = 1.0
@@ -621,7 +647,9 @@ anchor_bottom = 1.0
 margin_top = -1.29236
 margin_bottom = -1.29236
 
-[node name="Shop" parent="GUI/MiddlePanel" instance=ExtResource( 18 )]
+[node name="PopPanel" parent="GUI/MiddlePanel" instance=ExtResource( 19 )]
+show_behind_parent = true
+item_container_path = NodePath("../../MiddlePanel/PopPanel/Backpanel/SC/ItemContainer")
 
 [node name="LowerPanel" type="Control" parent="GUI"]
 editor/display_folded = true
@@ -634,14 +662,13 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="BackroundPanel" type="Panel" parent="GUI/LowerPanel"]
+[node name="BackroundPanel" type="TextureRect" parent="GUI/LowerPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 1
-custom_styles/panel = SubResource( 19 )
-__meta__ = {
-"_edit_lock_": true
-}
+margin_top = 25.0
+texture = ExtResource( 20 )
+expand = true
+stretch_mode = 6
 
 [node name="ExitButton" type="TextureButton" parent="GUI/LowerPanel/BackroundPanel"]
 anchor_top = 0.5
@@ -651,7 +678,7 @@ margin_top = -45.5
 margin_right = 129.0
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 20 )
+texture_normal = ExtResource( 21 )
 expand = true
 stretch_mode = 5
 
@@ -663,7 +690,7 @@ margin_top = -45.5
 margin_right = 233.941
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 21 )
+texture_normal = ExtResource( 22 )
 expand = true
 stretch_mode = 5
 
@@ -672,13 +699,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = -115.0
-margin_top = -145.773
-margin_right = 115.0
-margin_bottom = -24.7733
+margin_left = -116.469
+margin_top = -131.087
+margin_right = 113.531
+margin_bottom = -10.0876
 rect_pivot_offset = Vector2( 116.991, 62.903 )
 button_mask = 3
-texture_normal = ExtResource( 22 )
+texture_normal = ExtResource( 23 )
 expand = true
 stretch_mode = 5
 
@@ -690,7 +717,7 @@ margin_top = -45.5
 margin_right = 586.356
 margin_bottom = 44.5
 button_mask = 3
-texture_normal = ExtResource( 23 )
+texture_normal = ExtResource( 24 )
 expand = true
 stretch_mode = 5
 
@@ -704,16 +731,18 @@ margin_top = -132.143
 margin_right = -25.2112
 margin_bottom = -39.1431
 button_mask = 3
-texture_normal = ExtResource( 24 )
+texture_normal = ExtResource( 25 )
 expand = true
 stretch_mode = 5
-[connection signal="chop_tree" from="." to="World/Player" method="_on_GameScene_chop_tree"]
 [connection signal="chop_tree" from="." to="GUI" method="_on_GameScene_chop_tree"]
 [connection signal="new_tree" from="." to="GUI" method="_on_GameScene_new_tree"]
 [connection signal="on_gold_changed" from="." to="GUI" method="_on_GameScene_on_gold_changed"]
 [connection signal="on_wood_changed" from="." to="GUI" method="_on_GameScene_on_wood_changed"]
+[connection signal="player_chop" from="." to="World/Player" method="_on_GameScene_player_chop"]
 [connection signal="tree_down" from="." to="GUI" method="_on_GameScene_tree_down"]
+[connection signal="timeout" from="World/NewTreeTimer" to="." method="_on_NewTreeTimer_timeout"]
 [connection signal="is_raining" from="World/Enviroment/Rain" to="World/Enviroment" method="_on_Rain_is_raining"]
 [connection signal="timeout" from="World/Enviroment/Rain/RainTimer" to="World/Enviroment/Rain" method="_on_RainTimer_timeout"]
 [connection signal="gui_input" from="GUI/MiddlePanel/ClickArea" to="." method="_on_ClickArea_gui_input"]
 [connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ExitButton" to="." method="_on_ExitButton_button_down"]
+[connection signal="button_down" from="GUI/LowerPanel/BackroundPanel/ShopButton" to="GUI/MiddlePanel/PopPanel" method="_on_ShopButton_button_down"]
