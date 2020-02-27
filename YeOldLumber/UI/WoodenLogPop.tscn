@@ -27,7 +27,8 @@ func set_wood_count(value):
 
 func _on_Travel_tween_all_completed():
 	emit_signal('on_wood_ui', wood_count)
-	queue_free()
+	call_deferred('queue_free')
+	#queue_free()
 	pass # Replace with function body.
 "
 
