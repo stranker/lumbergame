@@ -11,7 +11,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
 
-export var health : int = 5
+export var health : int = 4
 export (Array, Mesh) var trunk_array
 export (Array, Mesh) var leaves_array
 
@@ -20,10 +20,14 @@ export (PackedScene) var wooden_log_scene
 signal tree_down
 signal on_chopped(health)
 
-
-func _ready():
+func init():
 	randomize()
 	randomize_tree()
+	set_health()
+	pass
+
+func set_health():
+	health += GameManager.difficulty_level
 	pass
 
 func randomize_tree():
