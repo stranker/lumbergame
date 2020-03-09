@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Assets/Trees/TreeTrunk.vox" type="ArrayMesh" id=1]
 [ext_resource path="res://Assets/Trees/TreeTrunk2.vox" type="ArrayMesh" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://Assets/Trees/TreeLeaves2.vox" type="ArrayMesh" id=5]
 [ext_resource path="res://Assets/Trees/TreeLeaves3.vox" type="ArrayMesh" id=6]
 [ext_resource path="res://Assets/Trees/TreeLeaves4.vox" type="ArrayMesh" id=7]
+[ext_resource path="res://Objects/WoodenLog.tscn" type="PackedScene" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
@@ -50,17 +51,30 @@ func take_chop(damage):
 		health -= damage
 		$Anim.play('Chop')
 		emit_signal('on_chopped', health)
+		spawn_wooden_log(damage)
 		if health <= 0:
 			emit_signal('tree_down')
 			transparency()
 			interpolate_fall()
 	pass
 
+func spawn_wooden_log(damage):
+	var wl = wooden_log_scene.instance()
+	get_tree().root.call_deferred('add_child',wl)
+	wl.translation = translation + Vector3(0,10,0)
+	wl.set_wood(damage)
+	pass
+
 func transparency():
-	var new_mat = $TreeTrunk/TreeLeaves.mesh.surface_get_material(0).duplicate()
-	new_mat.flags_transparent = true
-	$TreeTrunk/TreeLeaves.material_override = new_mat
-	$Tween.interpolate_property(new_mat,'albedo_color', Color.white,
+	var new_mat_leaves = $TreeTrunk/TreeLeaves.mesh.surface_get_material(0).duplicate()
+	var new_mat_trunk = $TreeTrunk.mesh.surface_get_material(0).duplicate()
+	new_mat_leaves.flags_transparent = true
+	new_mat_trunk.flags_transparent = true
+	$TreeTrunk/TreeLeaves.material_override = new_mat_trunk
+	$TreeTrunk.material_override = new_mat_leaves
+	$Tween.interpolate_property(new_mat_leaves,'albedo_color', Color.white,
+	Color(1,1,1,0), 0.5, Tween.TRANS_LINEAR, Tween.EASE_OUT, 0.2)
+	$Tween.interpolate_property(new_mat_trunk,'albedo_color', Color.white,
 	Color(1,1,1,0), 0.5, Tween.TRANS_LINEAR, Tween.EASE_OUT, 0.2)
 	pass
 
@@ -92,6 +106,7 @@ transform = Transform( 0.583964, 0, -0.811779, 0, 1, 0, 0.811779, 0, 0.583964, 0
 script = SubResource( 1 )
 trunk_array = [ ExtResource( 1 ), ExtResource( 2 ), ExtResource( 3 ) ]
 leaves_array = [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ]
+wooden_log_scene = ExtResource( 8 )
 
 [node name="Anim" type="AnimationPlayer" parent="."]
 anims/Chop = SubResource( 2 )
@@ -104,7 +119,7 @@ mesh = ExtResource( 1 )
 material/0 = null
 
 [node name="TreeLeaves" type="MeshInstance" parent="TreeTrunk"]
-transform = Transform( 1, 0, 2.08616e-007, 0, 1, 0, -2.08616e-007, 0, 1, 0, 18.7543, 0 )
+transform = Transform( 1, 0, 2.08616e-07, 0, 1, 0, -2.08616e-07, 0, 1, 0, 18.7543, 0 )
 mesh = ExtResource( 6 )
 material/0 = null
 [connection signal="tween_all_completed" from="Tween" to="." method="_on_Tween_tween_all_completed"]

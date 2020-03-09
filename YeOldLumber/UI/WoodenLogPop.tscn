@@ -5,7 +5,6 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
-signal on_wood_ui
 var wood_count : int = 0
 
 func _on_Anim_animation_finished(anim_name):
@@ -26,9 +25,8 @@ func set_wood_count(value):
 	pass
 
 func _on_Travel_tween_all_completed():
-	emit_signal('on_wood_ui', wood_count)
+	GameManager.add_wood(wood_count)
 	call_deferred('queue_free')
-	#queue_free()
 	pass # Replace with function body.
 "
 
@@ -44,7 +42,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.4 ),
 "transitions": PoolRealArray( 0.5, 1 ),
 "update": 0,
-"values": [ Vector2( 0, -3 ), Vector2( 0, -163 ) ]
+"values": [ Vector2( 20, 0 ), Vector2( 20, -150 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("Label:rect_position")
@@ -56,7 +54,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.4 ),
 "transitions": PoolRealArray( 0.5, 1 ),
 "update": 0,
-"values": [ Vector2( 100, 10 ), Vector2( 100, -150 ) ]
+"values": [ Vector2( 80, 10 ), Vector2( 80, -150 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath(".:modulate")
@@ -65,14 +63,13 @@ tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.3, 0.7 ),
+"times": PoolRealArray( 0, 0.2, 0.7 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ) ]
 }
 
 [node name="WoodenLogPop" type="Control"]
-modulate = Color( 1, 1, 1, 0 )
 margin_left = -80.0
 margin_top = -40.0
 margin_right = 90.0
@@ -83,11 +80,12 @@ script = SubResource( 1 )
 [node name="Texture" type="TextureRect" parent="."]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_top = -43.0
-margin_right = 58.0
-margin_bottom = 43.0
+margin_left = 20.0
+margin_top = -190.0
+margin_right = 65.0
+margin_bottom = -121.0
 rect_rotation = 90.0
-rect_pivot_offset = Vector2( 40, 61 )
+rect_pivot_offset = Vector2( 22.5, 34.5 )
 texture = ExtResource( 1 )
 expand = true
 stretch_mode = 6
@@ -97,10 +95,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = 15.0
-margin_top = -30.0
-margin_right = 54.9999
-margin_bottom = 5.0
+margin_left = -5.0
+margin_top = -190.0
+margin_right = 34.9999
+margin_bottom = -155.0
 rect_scale = Vector2( 2, 2 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 5
