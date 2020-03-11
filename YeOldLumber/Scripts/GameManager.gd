@@ -9,6 +9,9 @@ var middle_panel : Node = null
 
 signal on_wood_change(wood_count)
 
+func _ready():
+	pass
+
 func set_rect_on_screen(rect : Control, pos : Vector3):
 	rect.rect_global_position = game_camera.unproject_position(pos) - Vector2(50,0)
 	pass
