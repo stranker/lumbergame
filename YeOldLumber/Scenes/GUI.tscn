@@ -1,0 +1,384 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Scenes/HitMarker.tscn" type="PackedScene" id=1]
+[ext_resource path="res://UI/HealthUI.png" type="Texture" id=2]
+[ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=3]
+[ext_resource path="res://UI/CoinUI.png" type="Texture" id=4]
+[ext_resource path="res://UI/TreeUI.png" type="Texture" id=5]
+[ext_resource path="res://Scenes/PopPanel.tscn" type="PackedScene" id=6]
+[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=7]
+[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=8]
+[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=9]
+[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=10]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends CanvasLayer
+
+export (NodePath) var wood_count
+export (NodePath) var gold_count
+export (PackedScene) var hit_scene
+
+func _ready():
+	GameManager.wood_ui_pos = $UpperPanel/Wood/Texture.rect_global_position
+	GameManager.middle_panel= $MiddlePanel
+	GameManager.connect('on_wood_change',self,'on_wooden_log_ui')
+	pass
+
+func _on_GameScene_tree_down(trees_chopped):
+	$UpperPanel/Trees/Count.text = str(trees_chopped)
+	pass # Replace with function body.
+
+func on_tree_chopped(health):
+	$UpperPanel/TreeHealth/Bar.value = health
+
+func _on_GameScene_new_tree(tree):
+	$UpperPanel/TreeHealth/Bar.max_value = tree.health
+	$UpperPanel/TreeHealth/Bar.value = tree.health
+	pass # Replace with function body.
+
+func spawn_hit(pos : Vector2):
+	var hit = hit_scene.instance()
+	hit.rect_position = pos
+	$MiddlePanel/HitMarkers.add_child(hit)
+	pass
+
+func on_wooden_log_ui(wood):
+	if $UpperPanel/Wood/Anim.is_playing():
+		$UpperPanel/Wood/Anim.stop()
+	$UpperPanel/Wood/Anim.play('Increase')
+	update_wooden_count()
+	pass
+
+func update_wooden_count():
+	get_node(wood_count).text = str(GameManager.wood_count)
+	pass
+
+func update_gold_count():
+	get_node(gold_count).text = str(GameManager.gold_count)
+	pass
+
+func update_currency_count():
+	update_wooden_count()
+	update_gold_count()
+	pass"
+
+[sub_resource type="Animation" id=2]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Texture:rect_scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.5 ),
+"transitions": PoolRealArray( 1, 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1.5, 1.5 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Control
+
+export (PackedScene) var item_info_scene
+export (NodePath) var item_container_path
+onready var item_container = get_node(item_container_path)
+var on_screen : bool = false
+
+var test_items : Array = [1,2,3,4,5,6,7,8,9,10]
+
+func create_items(items : Array):
+	for item in items:
+		var item_panel = item_info_scene.instance()
+		#item_panel.set_item_info(item)
+		item_container.add_child(item_panel)
+	pass
+
+func _ready():
+	create_items(test_items)
+	pass
+
+func _on_Close_button_down():
+	$Anim.play_backwards('Appear')
+	pass # Replace with function body.
+
+func _on_ShopButton_button_down():
+	if !on_screen:
+		$Anim.play('Appear')
+	else:
+		_on_Close_button_down()
+	pass # Replace with function body.
+
+
+func _on_Anim_animation_finished(anim_name):
+	if anim_name == 'Appear':
+		on_screen = !on_screen
+	pass # Replace with function body.
+"
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.729412, 0.482353, 0.160784, 1 )
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color( 0.564706, 0.34902, 0.0627451, 1 )
+
+[node name="GUI" type="CanvasLayer"]
+script = SubResource( 1 )
+wood_count = NodePath("UpperPanel/Wood/Count")
+gold_count = NodePath("UpperPanel/Coin/Count")
+hit_scene = ExtResource( 1 )
+
+[node name="UpperPanel" type="Control" parent="."]
+editor/display_folded = true
+anchor_right = 1.0
+margin_bottom = 126.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TreeHealth" type="Control" parent="UpperPanel"]
+editor/display_folded = true
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -358.708
+margin_top = -24.9069
+margin_right = 361.292
+margin_bottom = 18.0931
+
+[node name="Bar" type="TextureProgress" parent="UpperPanel/TreeHealth"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -340.0
+margin_top = -20.0
+margin_right = 340.0
+margin_bottom = 20.0
+max_value = 5.0
+value = 5.0
+texture_under = ExtResource( 2 )
+texture_progress = ExtResource( 2 )
+tint_under = Color( 1, 0, 0, 1 )
+nine_patch_stretch = true
+
+[node name="Wood" type="Control" parent="UpperPanel"]
+editor/display_folded = true
+margin_left = 40.0
+margin_right = 288.0
+margin_bottom = 126.0
+
+[node name="Count" type="Label" parent="UpperPanel/Wood"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -30.5
+margin_top = -8.0
+margin_right = 30.5
+margin_bottom = 8.0
+rect_scale = Vector2( 3, 3 )
+rect_pivot_offset = Vector2( -0.72039, 7.44628 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="Texture" type="TextureRect" parent="UpperPanel/Wood"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -35.0
+margin_right = 93.0
+margin_bottom = 35.0
+rect_rotation = 50.5159
+rect_pivot_offset = Vector2( 47.1429, 35.9576 )
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="Anim" type="AnimationPlayer" parent="UpperPanel/Wood"]
+anims/Increase = SubResource( 2 )
+
+[node name="Coin" type="Control" parent="UpperPanel"]
+editor/display_folded = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -70.0
+margin_top = -63.0
+margin_right = 178.0
+margin_bottom = 63.0
+
+[node name="Texture" type="TextureRect" parent="UpperPanel/Coin"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -37.0
+margin_right = 66.0
+margin_bottom = 37.0
+rect_pivot_offset = Vector2( 31.7105, 37.8098 )
+texture = ExtResource( 4 )
+expand = true
+stretch_mode = 6
+
+[node name="Count" type="Label" parent="UpperPanel/Coin"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -30.5
+margin_top = -8.0
+margin_right = 30.5
+margin_bottom = 8.0
+rect_scale = Vector2( 3, 3 )
+rect_pivot_offset = Vector2( 0.0223465, 6.33824 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="Trees" type="Control" parent="UpperPanel"]
+editor/display_folded = true
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -220.0
+margin_right = 28.0
+margin_bottom = 126.0
+
+[node name="Count" type="Label" parent="UpperPanel/Trees"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -11.0
+margin_top = -7.0
+margin_right = 36.0
+margin_bottom = 7.0
+rect_scale = Vector2( 3, 3 )
+rect_pivot_offset = Vector2( 0.183838, 6.33197 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 5
+text = "0"
+
+[node name="Tree" type="TextureRect" parent="UpperPanel/Trees"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -32.5
+margin_right = 71.0
+margin_bottom = 32.5
+rect_pivot_offset = Vector2( 45.0019, 38.4583 )
+texture = ExtResource( 5 )
+expand = true
+stretch_mode = 6
+
+[node name="MiddlePanel" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -362.0
+margin_top = -483.0
+margin_right = 362.0
+margin_bottom = 471.0
+mouse_filter = 2
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="WoodPopPos" type="Control" parent="MiddlePanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 36.0
+margin_top = 30.0
+margin_right = 46.0
+margin_bottom = 40.0
+mouse_filter = 2
+
+[node name="HitMarkers" type="Control" parent="MiddlePanel"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -362.0
+margin_right = 362.0
+margin_bottom = 1111.0
+mouse_filter = 2
+
+[node name="PopPanel" parent="MiddlePanel" instance=ExtResource( 6 )]
+show_behind_parent = true
+script = SubResource( 3 )
+item_container_path = NodePath("../../MiddlePanel/PopPanel/Backpanel/SC/ItemContainer")
+
+[node name="LowerPanel" type="Control" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -169.0
+mouse_filter = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BackroundPanel" type="Panel" parent="LowerPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 79.0
+custom_styles/panel = SubResource( 4 )
+
+[node name="OptionsButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 170.0
+margin_top = -35.0
+margin_right = 254.0
+margin_bottom = 35.0
+button_mask = 3
+texture_normal = ExtResource( 7 )
+expand = true
+stretch_mode = 5
+
+[node name="ShopButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -350.0
+margin_top = -80.0
+margin_right = -186.0
+margin_bottom = -10.0
+rect_pivot_offset = Vector2( 116.991, 62.903 )
+button_mask = 3
+texture_normal = ExtResource( 8 )
+expand = true
+stretch_mode = 5
+
+[node name="InfoButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 250.0
+margin_top = -35.0
+margin_right = 326.0
+margin_bottom = 35.0
+button_mask = 3
+texture_normal = ExtResource( 9 )
+expand = true
+stretch_mode = 5
+
+[node name="CreditsButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -400.0
+margin_top = -80.0
+margin_right = -315.0
+margin_bottom = -9.0
+button_mask = 3
+texture_normal = ExtResource( 10 )
+expand = true
+stretch_mode = 5
+[connection signal="button_down" from="LowerPanel/BackroundPanel/ShopButton" to="MiddlePanel/PopPanel" method="_on_ShopButton_button_down"]
