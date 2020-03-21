@@ -14,15 +14,23 @@ export (NodePath) var price_info
 export (NodePath) var button_state
 var item_ref = null
 
+signal buy_item(item)
+signal equip_item(item)
+
+func _ready():
+	connect('buy_item', get_tree().root.get_node('GameScene/ItemManager'), 'on_buy_item')
+	connect('equip_item', get_tree().root.get_node('GameScene/ItemManager'), 'on_equip_item')
+	pass
+
 func set_item_info(item, type):
 	match type:
-		ItemManager.ITEM_TYPE.AXE:
+		GameManager.ITEM_TYPE.AXE:
 			set_axe_info(item)
 	pass
 
 func set_axe_info(item):
 	get_node(item_price).text = str(item.item_price)
-	get_node(item_image).texture = load(item.get_texture())
+	get_node(item_image).texture = item.get_texture()
 	get_node(item_name).text = item.item_name
 	get_node(item_info).text = item.item_info
 	item_ref = item
@@ -33,7 +41,7 @@ func set_axe_info(item):
 func set_button_state():
 	get_node(price_info).visible = !item_ref.item_buyed
 	get_node(button_state).visible = item_ref.item_buyed
-	get_node(button_state).get_node('Label').text = 'EQUIP' if ItemManager.current_axe != item_ref else 'EQUIPPED'
+	get_node(button_state).get_node('Label').text = 'EQUIP' if !item_ref.item_equipped else 'EQUIPPED'
 	pass
 
 func on_item_equipped(value : bool):
@@ -47,13 +55,13 @@ func _on_Button_button_down():
 	pass # Replace with function body.
 
 func buy_item():
-	ItemManager.buy_item(item_ref)
+	emit_signal('buy_item', item_ref)
 	if item_ref.item_buyed:
 		set_button_state()
 	pass
 
 func equip_item():
-	ItemManager.equip_item(item_ref)
+	emit_signal('equip_item', item_ref)
 	get_node(button_state).get_node('Label').text = 'EQUIPPED'
 	pass"
 
@@ -143,7 +151,6 @@ text = "LOREM IPSUM ZARLANGAS COSMICAS"
 align = 1
 
 [node name="ActionButton" type="Control" parent="Backpanel/HBC"]
-editor/display_folded = true
 margin_left = 534.0
 margin_right = 660.0
 margin_bottom = 64.0

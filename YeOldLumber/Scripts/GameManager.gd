@@ -7,6 +7,8 @@ var difficulty_level : int = 1
 var game_camera : Camera
 var middle_panel : Node = null
 
+enum ITEM_TYPE {AXE, SELL, LAST}
+
 signal on_wood_change(wood_count)
 
 func _ready():

@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scripts/ItemAxe.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Sprites/Shop/small_axe.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Axes/small_axe.vox" type="ArrayMesh" id=3]
+
+[node name="small_axe" type="Node"]
+script = ExtResource( 1 )
+item_name = "Small Axe"
+item_info = "The starter axe for new lumberjacks"
+item_damage = 1
+item_buyed = true
+item_equipped = true
+axe_texture_path = ExtResource( 2 )
+axe_model_path = ExtResource( 3 )

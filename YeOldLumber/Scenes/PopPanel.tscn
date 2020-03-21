@@ -9,7 +9,9 @@ script/source = "extends Control
 export (PackedScene) var item_info_scene
 export (NodePath) var item_container_path
 onready var item_container = get_node(item_container_path)
+onready var item_manager = get_node('/root/GameScene/ItemManager')
 var on_screen : bool = false
+
 
 func create_items(items : Array, type : int):
 	for item in items:
@@ -36,13 +38,13 @@ func show_buy_panel():
 
 func create_axes_panel():
 	clear_panel()
-	create_items(ItemManager.axes_list, ItemManager.ITEM_TYPE.AXE)
+	create_items(item_manager.axe_list, GameManager.ITEM_TYPE.AXE)
 	pass
 
 func clear_panel():
-	if $Backpanel/SC/ItemContainer.get_child_count() == 0:
+	if $Backpanel/SC/Items.get_child_count() == 0:
 		return
-	for panel in $Backpanel/SC/ItemContainer.get_children():
+	for panel in $Backpanel/SC/Items.get_children():
 		panel.call_deferred('queue_free')
 	pass
 
@@ -51,7 +53,7 @@ func _on_Anim_animation_finished(anim_name):
 		on_screen = !on_screen
 	pass # Replace with function body."
 
-[sub_resource type="StyleBoxFlat" id=3]
+[sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.729412, 0.482353, 0.160784, 1 )
 border_width_left = 10
 border_width_top = 10
@@ -59,8 +61,7 @@ border_width_right = 10
 border_width_bottom = 30
 border_color = Color( 0.564706, 0.34902, 0.0627451, 1 )
 
-[sub_resource type="Animation" id=2]
-resource_name = "Appear"
+[sub_resource type="Animation" id=3]
 length = 0.5
 tracks/0/type = "value"
 tracks/0/path = NodePath("Backpanel:rect_position")
@@ -93,7 +94,7 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = SubResource( 1 )
 item_info_scene = ExtResource( 1 )
-item_container_path = NodePath("Backpanel/SC/ItemContainer")
+item_container_path = NodePath("Backpanel/SC/Items")
 
 [node name="Backpanel" type="Panel" parent="."]
 anchor_left = 0.5
@@ -101,10 +102,10 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -360.0
-margin_top = 490.0
+margin_top = 60.0
 margin_right = 360.0
-margin_bottom = 929.0
-custom_styles/panel = SubResource( 3 )
+margin_bottom = 499.0
+custom_styles/panel = SubResource( 2 )
 
 [node name="SC" type="ScrollContainer" parent="Backpanel"]
 anchor_right = 1.0
@@ -115,7 +116,7 @@ margin_right = -20.0
 margin_bottom = -39.0
 scroll_horizontal_enabled = false
 
-[node name="ItemContainer" type="VBoxContainer" parent="Backpanel/SC"]
+[node name="Items" type="VBoxContainer" parent="Backpanel/SC"]
 custom_constants/separation = 5
 
 [node name="Close" type="TextureButton" parent="Backpanel"]
@@ -128,6 +129,6 @@ expand = true
 stretch_mode = 6
 
 [node name="Anim" type="AnimationPlayer" parent="."]
-anims/Appear = SubResource( 2 )
+anims/Appear = SubResource( 3 )
 [connection signal="button_down" from="Backpanel/Close" to="." method="_on_Close_button_down"]
 [connection signal="animation_finished" from="Anim" to="." method="_on_Anim_animation_finished"]

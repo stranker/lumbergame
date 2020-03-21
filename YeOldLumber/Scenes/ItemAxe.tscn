@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/Sprites/Shop/small_axe.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Axes/small_axe.vox" type="ArrayMesh" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+export var item_name : String
+export var item_price : int
+export var item_info : String
+export var item_damage : int
+export var item_buyed : bool = false
+export var item_equipped : bool = false
+export var axe_texture_path : Texture
+export var axe_model_path : Mesh
+
+signal equipped(val)
+
+func get_texture():
+	return axe_texture_path
+
+func get_model():
+	return axe_model_path
+
+func set_equiped(value):
+	item_equipped = value
+	emit_signal('equipped',item_equipped)"
+
+[node name="small_axe" type="Node"]
+script = SubResource( 1 )
+item_name = "Small axe"
+item_info = "The starter axe"
+item_damage = 1
+item_buyed = true
+item_equipped = true
+axe_texture_path = ExtResource( 1 )
+axe_model_path = ExtResource( 2 )

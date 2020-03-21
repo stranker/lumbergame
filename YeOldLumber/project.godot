@@ -22,7 +22,6 @@ config/icon="res://icon.png"
 [autoload]
 
 GameManager="*res://Scripts/GameManager.gd"
-ItemManager="*res://Scripts/ItemManager.gd"
 
 [display]
 

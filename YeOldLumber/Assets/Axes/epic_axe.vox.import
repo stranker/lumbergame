@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/epic_axe.vox-d11d75979d21751d38809581485f6af1.mesh"
+
+[deps]
+
+source_file="res://Assets/Axes/epic_axe.vox"
+dest_files=[ "res://.import/epic_axe.vox-d11d75979d21751d38809581485f6af1.mesh" ]
+
+[params]
+

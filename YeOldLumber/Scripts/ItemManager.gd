@@ -1,81 +1,45 @@
 extends Node
 
-var axes_list : Array
-var sell_list : Array
-enum ITEM_TYPE {AXE, SELL, LAST}
+export (Array, PackedScene) var axes_scene_list
+export (Array, PackedScene) var sell_scene_list
 
-var current_axe : ItemAxe = null
+var axe_list : Array
+var sell_list : Array
+
+var current_axe = null
 
 signal item_buy(item)
-
-class ItemAxe:
-	signal equipped(val)
-	var item_name : String
-	var item_price : int
-	var item_info : String
-	var item_damage : int
-	var item_texture : String
-	var item_buyed : bool = false
-	var item_equipped : bool = false
-	const axe_texture_path : String = 'res://Assets/Sprites/Shop/'
-	
-	func init(i_n, i_p, i_i, i_d, i_t, i_b):
-		item_name = str(i_n)
-		item_price = int(i_p)
-		item_info = str(i_i)
-		item_damage = int(i_d)
-		item_buyed = i_b
-		item_texture = str(i_t)
-	
-	func get_texture():
-		return axe_texture_path + item_texture
-	
-	func set_equiped(value):
-		item_equipped = value
-		emit_signal('equipped',item_equipped)
-
-class ItemSell:
-	var item_name : String
-	var item_revenue : int
-	var item_info : String
-	var item_texture : String
-	
-	func init(i_n, i_r, i_i, i_t):
-		item_name = str(i_n)
-		item_revenue = int(i_r)
-		item_info = str(i_i)
-		item_texture = str(i_t)
+signal equip_item(item)
 
 func _ready():
 	create_axes()
+	#create_sell_items()
 	pass
 
 func create_axes():
-	var small_axe = ItemAxe.new()
-	var epic_axe = ItemAxe.new()
-	var fish_axe = ItemAxe.new()
-	small_axe.init("Small Axe", 0, "A simple small axe", 1,'small_axe.png', true)
-	epic_axe.init("Epic Axe", 2000, "This axe was made by the ancient gods", 5, 'epic_axe.png', false)
-	fish_axe.init("Fish Axe", 5000, "Just a fish", 10, 'fish_axe.png', false)
-	axes_list.append(small_axe)
-	axes_list.append(epic_axe)
-	axes_list.append(fish_axe)
-	small_axe.set_equiped(true)
-	current_axe = small_axe
+	for axe_scene in axes_scene_list:
+		var axe = axe_scene.instance()
+		axe_list.append(axe)
+	current_axe = axe_list[0]
 	pass
 
-func buy_item(item_ref : ItemAxe):
-	print('buy ' + item_ref.item_name)
-	if GameManager.gold_count < item_ref.item_price:
+func create_sell_items():
+	for sell_scene in sell_scene_list:
+		var sell_item = sell_scene.instance()
+		sell_list.append(sell_item)
+	pass
+
+func on_buy_item(item):
+	if GameManager.gold_count < item.item_price:
 		return
-	GameManager.gold_count -= item_ref.item_price
-	item_ref.item_buyed = true
-	emit_signal('item_buy', item_ref)
+	GameManager.gold_count -= item.item_price
+	item.item_buyed = true
+	emit_signal('item_buy', item)
 	pass
 
-func equip_item(item_ref : ItemAxe):
-	print('equip ' + item_ref.item_name)
+func on_equip_item(item):
 	current_axe.set_equiped(false)
-	current_axe = item_ref
+	current_axe = item
 	current_axe.set_equiped(true)
+	emit_signal('equip_item', current_axe)
 	pass

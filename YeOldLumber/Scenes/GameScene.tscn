@@ -1,18 +1,19 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://Objects/Tree.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/ChopParticles.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=3]
-[ext_resource path="res://default_env.tres" type="Environment" id=4]
-[ext_resource path="res://Objects/Butterflies.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Objects/Bee.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Assets/Props/FlowerPW.vox" type="ArrayMesh" id=7]
-[ext_resource path="res://Assets/Props/FlowerRW.vox" type="ArrayMesh" id=8]
-[ext_resource path="res://Assets/Props/FlowerWR.vox" type="ArrayMesh" id=9]
-[ext_resource path="res://Assets/Props/FlowerWY.vox" type="ArrayMesh" id=10]
-[ext_resource path="res://Assets/Rock2.vox" type="ArrayMesh" id=11]
-[ext_resource path="res://Assets/Rock.vox" type="ArrayMesh" id=12]
-[ext_resource path="res://Scenes/GUI.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Scenes/ItemManager.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=4]
+[ext_resource path="res://default_env.tres" type="Environment" id=5]
+[ext_resource path="res://Objects/Butterflies.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Objects/Bee.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Assets/Props/FlowerPW.vox" type="ArrayMesh" id=8]
+[ext_resource path="res://Assets/Props/FlowerRW.vox" type="ArrayMesh" id=9]
+[ext_resource path="res://Assets/Props/FlowerWR.vox" type="ArrayMesh" id=10]
+[ext_resource path="res://Assets/Props/FlowerWY.vox" type="ArrayMesh" id=11]
+[ext_resource path="res://Assets/Rock2.vox" type="ArrayMesh" id=12]
+[ext_resource path="res://Assets/Rock.vox" type="ArrayMesh" id=13]
+[ext_resource path="res://Scenes/GUI.tscn" type="PackedScene" id=14]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -27,8 +28,6 @@ var current_tree
 signal player_chop
 signal tree_down(trees_chopped)
 signal new_tree(tree)
-
-var damage = 1
 
 func _ready():
 	spawn_new_tree()
@@ -51,7 +50,7 @@ func _on_ClickArea_gui_input(event):
 		spawn_hit(event.position)
 		emit_signal('player_chop')
 		if current_tree and current_tree.is_alive():
-			current_tree.take_chop(damage)
+			current_tree.take_chop($ItemManager.current_axe.item_damage)
 			spawn_particles()
 	pass # Replace with function body.
 
@@ -197,10 +196,12 @@ script = SubResource( 1 )
 tree_scene = ExtResource( 1 )
 particles_scene = ExtResource( 2 )
 
+[node name="ItemManager" parent="." instance=ExtResource( 3 )]
+
 [node name="World" type="Spatial" parent="."]
 editor/display_folded = true
 
-[node name="Player" parent="World" instance=ExtResource( 3 )]
+[node name="Player" parent="World" instance=ExtResource( 4 )]
 transform = Transform( 0.908947, 0, 0.416914, 0, 1, 0, -0.416914, 0, 0.908947, 0.171693, 1.00931, -6.1873 )
 
 [node name="NewTreeTimer" type="Timer" parent="World"]
@@ -209,7 +210,7 @@ one_shot = true
 
 [node name="TreePos" type="Position3D" parent="World"]
 editor/display_folded = true
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4008, -7.62939e-06, 0.418063 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4008, -7.62939e-006, 0.418063 )
 
 [node name="ChopParticles" type="Position3D" parent="World/TreePos"]
 transform = Transform( -0.986097, 0, -0.166172, 0, 1, 0, 0.166172, 0, -0.986097, -2.55483, 4.62651, -1.24022 )
@@ -234,8 +235,8 @@ transform = Transform( 0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0
 shape = SubResource( 7 )
 
 [node name="Camera" type="Camera" parent="World"]
-transform = Transform( -4.37114e-08, -0.255277, 0.966868, 0, 0.966868, 0.255277, -1, 1.11585e-08, -4.22631e-08, 48.13, 24.68, 0 )
-environment = ExtResource( 4 )
+transform = Transform( -4.37114e-008, -0.255277, 0.966868, 0, 0.966868, 0.255277, -1, 1.11585e-008, -4.22631e-008, 48.13, 24.68, 0 )
+environment = ExtResource( 5 )
 current = true
 fov = 82.5
 far = 296.8
@@ -243,13 +244,13 @@ far = 296.8
 [node name="Props" type="Spatial" parent="World"]
 editor/display_folded = true
 
-[node name="Butterflies" parent="World/Props" instance=ExtResource( 5 )]
+[node name="Butterflies" parent="World/Props" instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2, 12 )
 
-[node name="Butterflies3" parent="World/Props" instance=ExtResource( 5 )]
+[node name="Butterflies3" parent="World/Props" instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -4, -20 )
 
-[node name="Bee" parent="World/Props" instance=ExtResource( 6 )]
+[node name="Bee" parent="World/Props" instance=ExtResource( 7 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 6 )
 flowers_parent_path = NodePath("../Flowers")
 
@@ -258,27 +259,27 @@ editor/display_folded = true
 
 [node name="FlowerPW" type="MeshInstance" parent="World/Props/Flowers"]
 transform = Transform( 0.963227, 0, -0.268688, 0, 1, 0, 0.268688, 0, 0.963227, 20.9537, 0.274298, -0.347271 )
-mesh = ExtResource( 7 )
+mesh = ExtResource( 8 )
 material/0 = null
 
 [node name="FlowerPW2" type="MeshInstance" parent="World/Props/Flowers"]
 transform = Transform( 0.533712, 0, 0.845667, 0, 1, 0, -0.845667, 0, 0.533712, -12.2731, 0.274298, -12.4627 )
-mesh = ExtResource( 7 )
+mesh = ExtResource( 8 )
 material/0 = null
 
 [node name="FlowerRW" type="MeshInstance" parent="World/Props/Flowers"]
 transform = Transform( 0.666557, 0, 0.745454, 0, 1, 0, -0.745454, 0, 0.666557, 4.22233, 0.294421, 15.343 )
-mesh = ExtResource( 8 )
+mesh = ExtResource( 9 )
 material/0 = null
 
 [node name="FlowerWR" type="MeshInstance" parent="World/Props/Flowers"]
 transform = Transform( 0.895482, 0, -0.445098, 0, 1, 0, 0.445098, 0, 0.895482, -0.0835195, 0.328079, 14.4202 )
-mesh = ExtResource( 9 )
+mesh = ExtResource( 10 )
 material/0 = null
 
 [node name="FlowerWY" type="MeshInstance" parent="World/Props/Flowers"]
 transform = Transform( 0.713313, 0, 0.700845, 0, 1, 0, -0.700845, 0, 0.713313, 1.88473, 0.255441, -11.2724 )
-mesh = ExtResource( 10 )
+mesh = ExtResource( 11 )
 material/0 = null
 
 [node name="Rocks" type="Spatial" parent="World/Props"]
@@ -286,22 +287,22 @@ editor/display_folded = true
 
 [node name="Rock2" type="MeshInstance" parent="World/Props/Rocks"]
 transform = Transform( 0.319715, 0, 0.947514, 0, 1, 0, -0.947514, 0, 0.319715, 19.0048, 0.880862, 6.38468 )
-mesh = ExtResource( 11 )
+mesh = ExtResource( 12 )
 material/0 = null
 
 [node name="Rock3" type="MeshInstance" parent="World/Props/Rocks"]
 transform = Transform( 0.953787, 0, -0.300484, 0, 1, 0, 0.300484, 0, 0.953787, 3.17059, 0.880862, -17.6723 )
-mesh = ExtResource( 11 )
+mesh = ExtResource( 12 )
 material/0 = null
 
 [node name="Rock4" type="MeshInstance" parent="World/Props/Rocks"]
 transform = Transform( -0.975959, 0, 0.217956, 0, 1, 0, -0.217956, 0, -0.975959, -15.2345, 0.880862, 5.09899 )
-mesh = ExtResource( 11 )
+mesh = ExtResource( 12 )
 material/0 = null
 
 [node name="Rock" type="MeshInstance" parent="World/Props/Rocks"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5154, 0.884954, 20.4894 )
-mesh = ExtResource( 12 )
+mesh = ExtResource( 13 )
 material/0 = null
 
 [node name="Enviroment" type="Node" parent="World"]
@@ -340,7 +341,7 @@ emission_points = PoolVector3Array( 3.62815, 3.72399, 20.6783, 3.19981, -0.12440
 gravity = Vector3( 0, -20, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
-angular_velocity = 3.60134e-43
+angular_velocity = 3.60134e-043
 scale_amount = 0.2
 scale_amount_random = 1.0
 
@@ -357,7 +358,7 @@ spread = 0.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 0.0
 initial_velocity_random = 1.0
-angular_velocity = 3.22999e-42
+angular_velocity = 3.22999e-042
 linear_accel_random = 1.0
 scale_amount = 0.2
 scale_amount_random = 1.0
@@ -376,7 +377,7 @@ spread = 1.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 10.0
 initial_velocity_random = 1.0
-angular_velocity = 6.16571e-44
+angular_velocity = 6.16571e-044
 scale_amount = 1.5
 scale_amount_random = 1.0
 
@@ -391,11 +392,11 @@ spread = 1.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 10.0
 initial_velocity_random = 1.0
-angular_velocity = 6.16571e-44
+angular_velocity = 6.16571e-044
 scale_amount = 1.5
 scale_amount_random = 1.0
 
-[node name="GUI" parent="." instance=ExtResource( 13 )]
+[node name="GUI" parent="." instance=ExtResource( 14 )]
 
 [node name="ClickArea" type="Control" parent="."]
 anchor_left = 0.5
@@ -406,8 +407,11 @@ margin_left = -358.708
 margin_top = -480.0
 margin_right = 361.292
 margin_bottom = 553.0
+[connection signal="new_tree" from="." to="GUI" method="_on_GameScene_new_tree"]
 [connection signal="player_chop" from="." to="World/Player" method="_on_GameScene_player_chop"]
 [connection signal="tree_down" from="." to="GUI" method="_on_GameScene_tree_down"]
+[connection signal="equip_item" from="ItemManager" to="World/Player" method="_on_ItemManager_equip_item"]
+[connection signal="item_buy" from="ItemManager" to="GUI" method="_on_ItemManager_item_buy"]
 [connection signal="timeout" from="World/NewTreeTimer" to="." method="_on_NewTreeTimer_timeout"]
 [connection signal="is_raining" from="World/Enviroment/Rain" to="World/Enviroment" method="_on_Rain_is_raining"]
 [connection signal="timeout" from="World/Enviroment/Rain/RainTimer" to="World/Enviroment/Rain" method="_on_RainTimer_timeout"]

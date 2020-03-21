@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/small_axe.vox-48fe8f6f8b338421519d7119fad52848.mesh"
+
+[deps]
+
+source_file="res://Assets/Axes/small_axe.vox"
+dest_files=[ "res://.import/small_axe.vox-48fe8f6f8b338421519d7119fad52848.mesh" ]
+
+[params]
+

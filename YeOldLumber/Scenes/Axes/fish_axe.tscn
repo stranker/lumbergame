@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scripts/ItemAxe.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Sprites/Shop/fish_axe.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Axes/fish_axe.vox" type="ArrayMesh" id=3]
+
+[node name="fish_axe" type="Node"]
+script = ExtResource( 1 )
+item_name = "Fish Axe"
+item_price = 5000
+item_info = "Just a fish"
+item_damage = 10
+axe_texture_path = ExtResource( 2 )
+axe_model_path = ExtResource( 3 )

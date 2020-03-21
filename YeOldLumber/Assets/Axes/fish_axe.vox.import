@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/fish_axe.vox-1780b5d0b85f551a9d4a347f65d76398.mesh"
+
+[deps]
+
+source_file="res://Assets/Axes/fish_axe.vox"
+dest_files=[ "res://.import/fish_axe.vox-1780b5d0b85f551a9d4a347f65d76398.mesh" ]
+
+[params]
+
