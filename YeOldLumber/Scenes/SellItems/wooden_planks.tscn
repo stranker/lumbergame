@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/SellItem.gd" type="Script" id=1]
+[ext_resource path="res://UI/wooden_planks.png" type="Texture" id=2]
+
+[node name="wooden_planks" type="Node"]
+script = ExtResource( 1 )
+item_name = "Wooden planks"
+item_revenue = 1
+item_info = "Wooden planks info"
+item_texture = ExtResource( 2 )
+item_buyed = true

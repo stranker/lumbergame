@@ -1,10 +1,9 @@
 extends Node
 
 export (Array, PackedScene) var axes_scene_list
+var axe_list : Array = []
 export (Array, PackedScene) var sell_scene_list
-
-var axe_list : Array
-var sell_list : Array
+var sell_list : Array = []
 
 var current_axe = null
 
@@ -13,7 +12,7 @@ signal equip_item(item)
 
 func _ready():
 	create_axes()
-	#create_sell_items()
+	create_sell_items()
 	pass
 
 func create_axes():
@@ -42,4 +41,8 @@ func on_equip_item(item):
 	current_axe = item
 	current_axe.set_equiped(true)
 	emit_signal('equip_item', current_axe)
+	pass
+
+func on_exchange(item):
+	GameManager.exchange_wood(item.item_revenue)
 	pass

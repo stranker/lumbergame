@@ -8,6 +8,7 @@ export var item_buyed : bool = false
 export var item_equipped : bool = false
 export var axe_texture_path : Texture
 export var axe_model_path : Mesh
+const item_type = GameManager.ITEM_TYPE.AXE
 
 signal equipped(val)
 

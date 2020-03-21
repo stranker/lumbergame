@@ -18,6 +18,7 @@ func _ready():
 	GameManager.wood_ui_pos = $UpperPanel/Wood/Texture.rect_global_position
 	GameManager.middle_panel= $MiddlePanel
 	GameManager.connect('on_wood_change',self,'on_wooden_log_ui')
+	GameManager.connect('update_currency',self,'update_currency_count')
 	update_currency_count()
 	pass
 
@@ -70,6 +71,11 @@ func _on_BuyButton_button_down():
 
 func _on_ItemManager_item_buy(item):
 	on_item_buy(item)
+	pass # Replace with function body.
+
+
+func _on_SellButton_button_down():
+	$MiddlePanel/PopPanel.show_sell_panel()
 	pass # Replace with function body.
 "
 
@@ -322,3 +328,4 @@ margin_bottom = 90.0
 size_flags_horizontal = 3
 text = "Options"
 [connection signal="button_down" from="LowerPanel/BackroundPanel/HBC/BuyButton" to="." method="_on_BuyButton_button_down"]
+[connection signal="button_down" from="LowerPanel/BackroundPanel/HBC/SellButton" to="." method="_on_SellButton_button_down"]

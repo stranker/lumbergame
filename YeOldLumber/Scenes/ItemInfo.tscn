@@ -11,21 +11,26 @@ export (NodePath) var item_name
 export (NodePath) var item_info
 export (NodePath) var item_price
 export (NodePath) var price_info
-export (NodePath) var button_state
+export (NodePath) var axe_button_state
+export (NodePath) var sell_button_state
 var item_ref = null
 
 signal buy_item(item)
 signal equip_item(item)
+signal exchange(item)
 
 func _ready():
 	connect('buy_item', get_tree().root.get_node('GameScene/ItemManager'), 'on_buy_item')
 	connect('equip_item', get_tree().root.get_node('GameScene/ItemManager'), 'on_equip_item')
+	connect('exchange', get_tree().root.get_node('GameScene/ItemManager'), 'on_exchange')
 	pass
 
 func set_item_info(item, type):
 	match type:
 		GameManager.ITEM_TYPE.AXE:
 			set_axe_info(item)
+		GameManager.ITEM_TYPE.SELL:
+			set_sell_info(item)
 	pass
 
 func set_axe_info(item):
@@ -38,20 +43,36 @@ func set_axe_info(item):
 	item.connect('equipped', self, 'on_item_equipped')
 	pass
 
+func set_sell_info(item):
+	get_node(item_price).text = str(item.item_price)
+	get_node(item_image).texture = item.get_texture()
+	get_node(item_name).text = item.item_name
+	get_node(item_info).text = item.item_info
+	item_ref = item
+	set_button_state()
+	pass
+
 func set_button_state():
 	get_node(price_info).visible = !item_ref.item_buyed
-	get_node(button_state).visible = item_ref.item_buyed
-	get_node(button_state).get_node('Label').text = 'EQUIP' if !item_ref.item_equipped else 'EQUIPPED'
+	match item_ref.item_type:
+		GameManager.ITEM_TYPE.AXE:
+			get_node(axe_button_state).visible = item_ref.item_buyed
+			get_node(axe_button_state).get_node('Label').text = 'EQUIP' if !item_ref.item_equipped else 'EQUIPPED'
+		GameManager.ITEM_TYPE.SELL:
+			get_node(sell_button_state).visible = item_ref.item_buyed
 	pass
 
 func on_item_equipped(value : bool):
-	get_node(button_state).get_node('Label').text = 'EQUIPPED' if value else 'EQUIP'
+	get_node(axe_button_state).get_node('Label').text = 'EQUIPPED' if value else 'EQUIP'
 
 func _on_Button_button_down():
 	if !item_ref.item_buyed:
 		buy_item()
 	else:
-		equip_item()
+		if item_ref.item_type == GameManager.ITEM_TYPE.AXE:
+			equip_item()
+		else:
+			exchange()
 	pass # Replace with function body.
 
 func buy_item():
@@ -62,7 +83,11 @@ func buy_item():
 
 func equip_item():
 	emit_signal('equip_item', item_ref)
-	get_node(button_state).get_node('Label').text = 'EQUIPPED'
+	get_node(axe_button_state).get_node('Label').text = 'EQUIPPED'
+	pass
+
+func exchange():
+	emit_signal('exchange', item_ref)
 	pass"
 
 [sub_resource type="StyleBoxFlat" id=2]
@@ -79,6 +104,7 @@ anchor_bottom = 1.0
 margin_right = -40.0
 margin_bottom = -1200.0
 rect_min_size = Vector2( 680, 80 )
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = SubResource( 1 )
@@ -87,11 +113,13 @@ item_name = NodePath("Backpanel/HBC/Info/Name")
 item_info = NodePath("Backpanel/HBC/Info/Info")
 item_price = NodePath("Backpanel/HBC/ActionButton/Button/PriceInfo/Price")
 price_info = NodePath("Backpanel/HBC/ActionButton/Button/PriceInfo")
-button_state = NodePath("Backpanel/HBC/ActionButton/Button/ButtonState")
+axe_button_state = NodePath("Backpanel/HBC/ActionButton/Button/AxeButtonState")
+sell_button_state = NodePath("Backpanel/HBC/ActionButton/Button/SellButtonState")
 
 [node name="Backpanel" type="Panel" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 1
 custom_styles/panel = SubResource( 2 )
 
 [node name="HBC" type="HBoxContainer" parent="Backpanel"]
@@ -116,10 +144,12 @@ expand = true
 stretch_mode = 6
 
 [node name="Info" type="Control" parent="Backpanel/HBC"]
+editor/display_folded = true
 margin_left = 130.0
 margin_right = 530.0
 margin_bottom = 64.0
 rect_min_size = Vector2( 400, 60 )
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -154,6 +184,7 @@ align = 1
 margin_left = 534.0
 margin_right = 660.0
 margin_bottom = 64.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -202,17 +233,31 @@ texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="ButtonState" type="Control" parent="Backpanel/HBC/ActionButton/Button"]
+[node name="AxeButtonState" type="Control" parent="Backpanel/HBC/ActionButton/Button"]
 editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="Backpanel/HBC/ActionButton/Button/ButtonState"]
+[node name="Label" type="Label" parent="Backpanel/HBC/ActionButton/Button/AxeButtonState"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 text = "EQUIP"
+align = 1
+valign = 1
+
+[node name="SellButtonState" type="Control" parent="Backpanel/HBC/ActionButton/Button"]
+editor/display_folded = true
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Backpanel/HBC/ActionButton/Button/SellButtonState"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "EXCHANGE"
 align = 1
 valign = 1
 [connection signal="button_down" from="Backpanel/HBC/ActionButton/Button" to="." method="_on_Button_button_down"]
