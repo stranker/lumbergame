@@ -407,6 +407,7 @@ margin_top = -480.0
 margin_right = 361.292
 margin_bottom = 553.0
 [connection signal="player_chop" from="." to="World/Player" method="_on_GameScene_player_chop"]
+[connection signal="tree_down" from="." to="GUI" method="_on_GameScene_tree_down"]
 [connection signal="timeout" from="World/NewTreeTimer" to="." method="_on_NewTreeTimer_timeout"]
 [connection signal="is_raining" from="World/Enviroment/Rain" to="World/Enviroment" method="_on_Rain_is_raining"]
 [connection signal="timeout" from="World/Enviroment/Rain/RainTimer" to="World/Enviroment/Rain" method="_on_RainTimer_timeout"]

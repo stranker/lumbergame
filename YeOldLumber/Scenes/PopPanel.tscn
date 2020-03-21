@@ -1,8 +1,7 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/ItemInfo.tscn" type="PackedScene" id=1]
-[ext_resource path="res://UI/ShopPanel.png" type="Texture" id=2]
-[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=3]
+[ext_resource path="res://UI/Buttons/ExitButtonUI.png" type="Texture" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -12,36 +11,53 @@ export (NodePath) var item_container_path
 onready var item_container = get_node(item_container_path)
 var on_screen : bool = false
 
-var test_items : Array = [1,2,3,4,5,6,7,8,9,10]
-
-func create_items(items : Array):
+func create_items(items : Array, type : int):
 	for item in items:
 		var item_panel = item_info_scene.instance()
-		#item_panel.set_item_info(item)
+		item_panel.set_item_info(item, type)
 		item_container.add_child(item_panel)
-	pass
-
-func _ready():
-	create_items(test_items)
 	pass
 
 func _on_Close_button_down():
 	$Anim.play_backwards('Appear')
 	pass # Replace with function body.
 
-func _on_ShopButton_button_down():
+func appear():
 	if !on_screen:
 		$Anim.play('Appear')
 	else:
 		_on_Close_button_down()
+	pass
+
+func show_buy_panel():
+	create_axes_panel()
+	appear()
 	pass # Replace with function body.
 
+func create_axes_panel():
+	clear_panel()
+	create_items(ItemManager.axes_list, ItemManager.ITEM_TYPE.AXE)
+	pass
+
+func clear_panel():
+	if $Backpanel/SC/ItemContainer.get_child_count() == 0:
+		return
+	for panel in $Backpanel/SC/ItemContainer.get_children():
+		panel.call_deferred('queue_free')
+	pass
 
 func _on_Anim_animation_finished(anim_name):
 	if anim_name == 'Appear':
 		on_screen = !on_screen
-	pass # Replace with function body.
-"
+	pass # Replace with function body."
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.729412, 0.482353, 0.160784, 1 )
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 30
+border_color = Color( 0.564706, 0.34902, 0.0627451, 1 )
 
 [sub_resource type="Animation" id=2]
 resource_name = "Appear"
@@ -79,30 +95,24 @@ script = SubResource( 1 )
 item_info_scene = ExtResource( 1 )
 item_container_path = NodePath("Backpanel/SC/ItemContainer")
 
-[node name="Backpanel" type="TextureRect" parent="."]
-visible = false
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-margin_left = -360.0
-margin_top = 10.0
-margin_right = 360.0
-margin_bottom = 902.0
-texture = ExtResource( 2 )
-expand = true
-stretch_mode = 6
-
-[node name="SC" type="ScrollContainer" parent="Backpanel"]
-editor/display_folded = true
+[node name="Backpanel" type="Panel" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -300.0
-margin_top = -376.0
-margin_right = 300.0
-margin_bottom = 364.0
+margin_left = -360.0
+margin_top = 490.0
+margin_right = 360.0
+margin_bottom = 929.0
+custom_styles/panel = SubResource( 3 )
+
+[node name="SC" type="ScrollContainer" parent="Backpanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -39.0
 scroll_horizontal_enabled = false
 
 [node name="ItemContainer" type="VBoxContainer" parent="Backpanel/SC"]
@@ -111,9 +121,9 @@ custom_constants/separation = 5
 [node name="Close" type="TextureButton" parent="Backpanel"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -70.0
-margin_bottom = 70.0
-texture_normal = ExtResource( 3 )
+margin_left = -40.0
+margin_bottom = 40.0
+texture_normal = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 

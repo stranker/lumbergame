@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Scenes/HitMarker.tscn" type="PackedScene" id=1]
 [ext_resource path="res://UI/HealthUI.png" type="Texture" id=2]
@@ -6,10 +6,6 @@
 [ext_resource path="res://UI/CoinUI.png" type="Texture" id=4]
 [ext_resource path="res://UI/TreeUI.png" type="Texture" id=5]
 [ext_resource path="res://Scenes/PopPanel.tscn" type="PackedScene" id=6]
-[ext_resource path="res://UI/Buttons/OptionsButtonUI.png" type="Texture" id=7]
-[ext_resource path="res://UI/Buttons/ShopButtonUI.png" type="Texture" id=8]
-[ext_resource path="res://UI/Buttons/InfoButtonUI.png" type="Texture" id=9]
-[ext_resource path="res://UI/Buttons/CreditsButtonUI.png" type="Texture" id=10]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends CanvasLayer
@@ -22,6 +18,8 @@ func _ready():
 	GameManager.wood_ui_pos = $UpperPanel/Wood/Texture.rect_global_position
 	GameManager.middle_panel= $MiddlePanel
 	GameManager.connect('on_wood_change',self,'on_wooden_log_ui')
+	ItemManager.connect('item_buy',self ,'on_item_buy')
+	update_currency_count()
 	pass
 
 func _on_GameScene_tree_down(trees_chopped):
@@ -60,7 +58,16 @@ func update_gold_count():
 func update_currency_count():
 	update_wooden_count()
 	update_gold_count()
-	pass"
+	pass
+
+func on_item_buy(item):
+	update_currency_count()
+	pass
+
+func _on_BuyButton_button_down():
+	$MiddlePanel/PopPanel.show_buy_panel()
+	pass # Replace with function body.
+"
 
 [sub_resource type="Animation" id=2]
 length = 0.5
@@ -76,45 +83,6 @@ tracks/0/keys = {
 "update": 0,
 "values": [ Vector2( 1, 1 ), Vector2( 1.5, 1.5 ), Vector2( 1, 1 ) ]
 }
-
-[sub_resource type="GDScript" id=3]
-script/source = "extends Control
-
-export (PackedScene) var item_info_scene
-export (NodePath) var item_container_path
-onready var item_container = get_node(item_container_path)
-var on_screen : bool = false
-
-var test_items : Array = [1,2,3,4,5,6,7,8,9,10]
-
-func create_items(items : Array):
-	for item in items:
-		var item_panel = item_info_scene.instance()
-		#item_panel.set_item_info(item)
-		item_container.add_child(item_panel)
-	pass
-
-func _ready():
-	create_items(test_items)
-	pass
-
-func _on_Close_button_down():
-	$Anim.play_backwards('Appear')
-	pass # Replace with function body.
-
-func _on_ShopButton_button_down():
-	if !on_screen:
-		$Anim.play('Appear')
-	else:
-		_on_Close_button_down()
-	pass # Replace with function body.
-
-
-func _on_Anim_animation_finished(anim_name):
-	if anim_name == 'Appear':
-		on_screen = !on_screen
-	pass # Replace with function body.
-"
 
 [sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0.729412, 0.482353, 0.160784, 1 )
@@ -276,6 +244,7 @@ expand = true
 stretch_mode = 6
 
 [node name="MiddlePanel" type="Control" parent="."]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -309,9 +278,6 @@ margin_bottom = 1111.0
 mouse_filter = 2
 
 [node name="PopPanel" parent="MiddlePanel" instance=ExtResource( 6 )]
-show_behind_parent = true
-script = SubResource( 3 )
-item_container_path = NodePath("../../MiddlePanel/PopPanel/Backpanel/SC/ItemContainer")
 
 [node name="LowerPanel" type="Control" parent="."]
 anchor_top = 1.0
@@ -329,56 +295,27 @@ anchor_bottom = 1.0
 margin_top = 79.0
 custom_styles/panel = SubResource( 4 )
 
-[node name="OptionsButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
-anchor_top = 0.5
-anchor_bottom = 0.5
-margin_left = 170.0
-margin_top = -35.0
-margin_right = 254.0
-margin_bottom = 35.0
-button_mask = 3
-texture_normal = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="ShopButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-margin_left = -350.0
-margin_top = -80.0
-margin_right = -186.0
-margin_bottom = -10.0
-rect_pivot_offset = Vector2( 116.991, 62.903 )
-button_mask = 3
-texture_normal = ExtResource( 8 )
-expand = true
-stretch_mode = 5
-
-[node name="InfoButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
-anchor_top = 0.5
-anchor_bottom = 0.5
-margin_left = 250.0
-margin_top = -35.0
-margin_right = 326.0
-margin_bottom = 35.0
-button_mask = 3
-texture_normal = ExtResource( 9 )
-expand = true
-stretch_mode = 5
-
-[node name="CreditsButton" type="TextureButton" parent="LowerPanel/BackroundPanel"]
-anchor_left = 1.0
-anchor_top = 1.0
+[node name="HBC" type="HBoxContainer" parent="LowerPanel/BackroundPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -400.0
-margin_top = -80.0
-margin_right = -315.0
-margin_bottom = -9.0
-button_mask = 3
-texture_normal = ExtResource( 10 )
-expand = true
-stretch_mode = 5
-[connection signal="button_down" from="LowerPanel/BackroundPanel/ShopButton" to="MiddlePanel/PopPanel" method="_on_ShopButton_button_down"]
+
+[node name="BuyButton" type="Button" parent="LowerPanel/BackroundPanel/HBC"]
+margin_right = 237.0
+margin_bottom = 90.0
+size_flags_horizontal = 3
+text = "BUY"
+
+[node name="SellButton" type="Button" parent="LowerPanel/BackroundPanel/HBC"]
+margin_left = 241.0
+margin_right = 478.0
+margin_bottom = 90.0
+size_flags_horizontal = 3
+text = "SELL"
+
+[node name="OptionsButton" type="Button" parent="LowerPanel/BackroundPanel/HBC"]
+margin_left = 482.0
+margin_right = 720.0
+margin_bottom = 90.0
+size_flags_horizontal = 3
+text = "Options"
+[connection signal="button_down" from="LowerPanel/BackroundPanel/HBC/BuyButton" to="." method="_on_BuyButton_button_down"]
