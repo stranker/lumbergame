@@ -18,7 +18,7 @@ var last_panel = null
 func create_items(items : Array, type : int):
 	for item in items:
 		var item_panel = item_info_scene.instance()
-		item_panel.set_item_info(item, type)
+		item_panel.call_deferred('set_item_info',item,type)
 		item_container.add_child(item_panel)
 	pass
 
@@ -70,6 +70,10 @@ border_width_top = 10
 border_width_right = 10
 border_width_bottom = 30
 border_color = Color( 0.564706, 0.34902, 0.0627451, 1 )
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
 
 [sub_resource type="Animation" id=3]
 length = 0.5
@@ -107,6 +111,7 @@ item_info_scene = ExtResource( 1 )
 item_container_path = NodePath("Backpanel/SC/Items")
 
 [node name="Backpanel" type="Panel" parent="."]
+editor/display_folded = true
 visible = false
 anchor_left = 0.5
 anchor_top = 0.5
@@ -114,7 +119,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -360.0
 margin_top = 650.0
-margin_right = 360.0
+margin_right = 365.0
 margin_bottom = 1089.0
 custom_styles/panel = SubResource( 2 )
 

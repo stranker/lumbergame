@@ -3,6 +3,7 @@ extends Node
 var wood_ui_pos : Vector2
 var wood_count : int = 0
 var gold_count : int = 9999
+var trees_chopped : int = 0
 var difficulty_level : int = 1
 var game_camera : Camera
 var middle_panel : Node = null
@@ -10,7 +11,8 @@ var middle_panel : Node = null
 enum ITEM_TYPE {AXE, SELL, LAST}
 
 signal on_wood_change(wood_count)
-signal update_currency
+signal on_gold_change(gold_count)
+signal on_tree_change(tree_count)
 
 func set_rect_on_screen(rect : Control, pos : Vector3):
 	rect.rect_global_position = game_camera.unproject_position(pos) - Vector2(50,0)
@@ -26,5 +28,12 @@ func exchange_wood(value):
 		return
 	gold_count += value * wood_count
 	wood_count = 0
-	emit_signal('update_currency')
+	emit_signal('on_gold_change', gold_count)
+	pass
+
+func on_tree_chopped():
+	trees_chopped += 1
+	if trees_chopped % 11 == 0:
+		difficulty_level += 1
+	emit_signal('on_tree_change', trees_chopped)
 	pass

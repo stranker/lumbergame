@@ -8,6 +8,8 @@ export var item_texture : Texture
 export var item_buyed : bool
 const item_type = GameManager.ITEM_TYPE.SELL
 
+func get_info():
+	pass
 
 func get_texture():
 	return item_texture

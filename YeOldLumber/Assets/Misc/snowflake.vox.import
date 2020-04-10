@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/snowflake.vox-83f3693a3ad931846fe740f3a7307f9d.mesh"
+
+[deps]
+
+source_file="res://Assets/Misc/snowflake.vox"
+dest_files=[ "res://.import/snowflake.vox-83f3693a3ad931846fe740f3a7307f9d.mesh" ]
+
+[params]
+

@@ -21,3 +21,7 @@ func get_model():
 func set_equiped(value):
 	item_equipped = value
 	emit_signal('equipped',item_equipped)
+
+func get_info():
+	var info = '[center]' + item_info + '. [color=#770985][b]DMG: ' + str(item_damage) + '[/b][/color][/center]'
+	return info

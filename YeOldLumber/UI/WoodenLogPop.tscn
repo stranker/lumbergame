@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://UI/WoodenLogUI.png" type="Texture" id=1]
+[ext_resource path="res://Fonts/teen/teen.ttf" type="DynamicFontData" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -29,6 +30,11 @@ func _on_Travel_tween_all_completed():
 	call_deferred('queue_free')
 	pass # Replace with function body.
 "
+
+[sub_resource type="DynamicFont" id=3]
+size = 26
+use_filter = true
+font_data = ExtResource( 2 )
 
 [sub_resource type="Animation" id=2]
 length = 0.8
@@ -98,9 +104,10 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -5.0
 margin_top = -190.0
-margin_right = 34.9999
-margin_bottom = -155.0
+margin_right = 35.0
+margin_bottom = -151.0
 rect_scale = Vector2( 2, 2 )
+custom_fonts/font = SubResource( 3 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 5
 text = "+1"

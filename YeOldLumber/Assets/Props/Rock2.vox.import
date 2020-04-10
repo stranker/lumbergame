@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/Rock2.vox-e6560532122e32fe7397a374d732edc6.mesh"
+
+[deps]
+
+source_file="res://Assets/Props/Rock2.vox"
+dest_files=[ "res://.import/Rock2.vox-e6560532122e32fe7397a374d732edc6.mesh" ]
+
+[params]
+

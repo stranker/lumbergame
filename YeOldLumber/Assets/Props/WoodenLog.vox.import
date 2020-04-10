@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/WoodenLog.vox-32eb3799b6cef77bb499c3ac1fed945b.mesh"
+
+[deps]
+
+source_file="res://Assets/Props/WoodenLog.vox"
+dest_files=[ "res://.import/WoodenLog.vox-32eb3799b6cef77bb499c3ac1fed945b.mesh" ]
+
+[params]
+

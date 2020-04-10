@@ -1,0 +1,13 @@
+[remap]
+
+importer="MagicaVoxel-Importer"
+type="Mesh"
+path="res://.import/leave.vox-45a154622b20e6925a6532038eb5fe17.mesh"
+
+[deps]
+
+source_file="res://Assets/Misc/leave.vox"
+dest_files=[ "res://.import/leave.vox-45a154622b20e6925a6532038eb5fe17.mesh" ]
+
+[params]
+
